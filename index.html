@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Sleep &amp; Anxiety Workspace</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sticky tab bar over one reading column; each tab is a view routed by #hash. Wide tables scroll in their own wrappers. */
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f7f4fb;
+  --ink:#2a1b35;
+  --muted:#5f5370;
+  --line:#e4dced;
+  --purple:#7e4d9f;
+  --purple-ink:#6a3f88;
+  --gold-soft:#fdf3df;
+  --dawn:#f5c76a;
+  --night:#31364e;
+  --ok:#2e7d4f;
+  --warn:#b4541e;
+  --crit:#b3261e;
+  --card:#ffffff;
+  --on-accent:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17121d; --bg-soft:#201a29; --ink:#ece5f4; --muted:#a697b8;
+    --line:#352c42; --purple:#b48ad1; --purple-ink:#c5a3dd;
+    --gold-soft:#2b2410; --dawn:#d9a845; --night:#9aa3c7;
+    --ok:#6fbf8f; --warn:#e09a62; --crit:#e2766f; --card:#1d1726; --on-accent:#17121d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17121d; --bg-soft:#201a29; --ink:#ece5f4; --muted:#a697b8;
+  --line:#352c42; --purple:#b48ad1; --purple-ink:#c5a3dd;
+  --gold-soft:#2b2410; --dawn:#d9a845; --night:#9aa3c7;
+  --ok:#6fbf8f; --warn:#e09a62; --crit:#e2766f; --card:#1d1726; --on-accent:#17121d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:72px}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Work Sans",system-ui,-apple-system,sans-serif;
+  font-size:16px; line-height:1.6; margin:0;
+  padding-block:0 64px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:920px; margin:0 auto}
+h1,h2{font-family:"Lora",Georgia,serif; font-weight:500; line-height:1.2; text-wrap:balance; margin:0}
+h1{font-size:clamp(30px,5vw,42px)}
+h2{font-size:26px; margin:60px 0 8px}
+h3{font-size:17px; margin:28px 0 6px; font-weight:600}
+p{margin:10px 0; max-width:70ch}
+a{color:var(--purple-ink)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--purple); outline-offset:2px; border-radius:4px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.85em; background:var(--bg-soft); border:1px solid var(--line); border-radius:4px; padding:1px 5px; overflow-wrap:anywhere}
+.eyebrow{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--purple-ink); margin:40px 0 10px}
+.lede{font-size:18px; color:var(--muted); max-width:64ch}
+.secnote{color:var(--muted); margin-top:0; font-size:15px}
+
+/* tab bar */
+.tabs{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg); border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex; gap:2px; overflow-x:auto; scrollbar-width:none}
+.tabs .wrap::-webkit-scrollbar{display:none}
+.tabs a{flex:0 0 auto; text-decoration:none; color:var(--muted); font-size:14px; font-weight:500; padding:14px 12px 12px; border-bottom:3px solid transparent; white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{color:var(--purple-ink); border-bottom-color:var(--purple); font-weight:600}
+.inner{display:flex; flex-wrap:wrap; gap:6px 18px; margin:18px 0 0; padding:10px 0; border-block:1px solid var(--line); font-size:13.5px}
+.inner a{text-decoration:none}
+.inner span{color:var(--muted); font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; align-self:center}
+
+/* shared blocks */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin:18px 0}
+.stat{background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:12px 14px}
+.stat b{display:block; font-size:24px; font-family:"Lora",Georgia,serif; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.2}
+.stat span{display:block; font-size:13px; color:var(--muted); margin-top:4px}
+.stat small{display:block; font-size:11.5px; color:var(--muted); margin-top:6px; opacity:.85}
+
+.find{display:grid; gap:10px; margin:18px 0 0}
+.fi{display:grid; grid-template-columns:28px 1fr; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+.fi .n{font-family:"Lora",Georgia,serif; font-size:20px; color:var(--purple-ink); font-variant-numeric:tabular-nums; line-height:1.3}
+.fi b{display:block; font-size:15.5px; margin-bottom:2px}
+.fi p{margin:0; font-size:14.5px; max-width:none; min-width:0}
+
+.tblwrap{overflow-x:auto; margin:14px 0}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:620px}
+th{font-size:12px; letter-spacing:.07em; text-transform:uppercase; text-align:left; color:var(--muted); font-weight:600; border-bottom:2px solid var(--line); padding:8px 14px 8px 0}
+td{border-bottom:1px solid var(--line); padding:9px 14px 9px 0; vertical-align:top}
+td:last-child,th:last-child{padding-right:0}
+tr:last-child td{border-bottom:none}
+td.k{font-weight:600}
+.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+
+.pill{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; border-radius:999px; padding:2px 9px; white-space:nowrap}
+.pill.s{background:var(--ok); color:var(--on-accent)}
+.pill.p{background:var(--bg-soft); color:var(--muted); border:1px solid var(--line)}
+.pill.a{background:var(--crit); color:var(--on-accent)}
+.pill.r{background:var(--purple); color:var(--on-accent)}
+.pill.pk{background:var(--gold-soft); color:var(--warn); border:1px solid var(--line)}
+.pill.done{background:var(--ok); color:var(--on-accent)}
+.pill.next{background:var(--gold-soft); color:var(--warn); border:1px solid var(--line)}
+.pill.todo{background:var(--bg-soft); color:var(--muted); border:1px solid var(--line)}
+.pill.build{background:var(--purple); color:var(--on-accent); margin-left:6px; vertical-align:1px}
+
+.callout{background:var(--gold-soft); border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin:18px 0; font-size:15px}
+.callout p{max-width:none; margin:6px 0}
+.rail{border-left:4px solid var(--warn); padding:2px 0 2px 16px; margin:16px 0; font-size:15px}
+.rail.ok{border-color:var(--ok)}
+.rail p{max-width:none}
+ul.tight{margin:8px 0; padding-left:20px}
+ul.tight li{margin:5px 0; max-width:72ch}
+.src{font-size:12.5px; color:var(--muted)}
+.uv{font-size:11px; font-weight:700; color:var(--warn); letter-spacing:.04em}
+
+.risk{display:grid; grid-template-columns:96px 1fr; gap:14px; padding:13px 0; border-top:1px solid var(--line); font-size:15px}
+.risk:last-of-type{border-bottom:1px solid var(--line)}
+.risk .sev{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding-top:3px}
+.sev.crit{color:var(--crit)} .sev.warn{color:var(--warn)} .sev.ok{color:var(--ok)}
+.risk p{margin:0; max-width:none; min-width:0}
+.risk b{display:block; margin-bottom:2px}
+@media (max-width:560px){ .risk{grid-template-columns:1fr; gap:2px} }
+
+/* overview: flow */
+.flow{display:grid; gap:8px; margin:16px 0}
+.flowrow{display:flex; flex-wrap:wrap; align-items:stretch; gap:6px}
+.node{flex:1 1 130px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13.5px; min-width:0}
+.node b{display:block; font-size:14px}
+.node span{color:var(--muted); font-size:12.5px}
+.node.goal{background:var(--purple); border-color:var(--purple); color:var(--on-accent)}
+.node.goal span{color:var(--on-accent); opacity:.85}
+.node.loop{border-style:dashed}
+.arrow{flex:0 0 auto; align-self:center; color:var(--muted); font-size:18px}
+@media (max-width:640px){ .arrow{display:none} }
+
+.timeline{list-style:none; margin:14px 0; padding:0; border-left:2px solid var(--line)}
+.timeline li{position:relative; padding:4px 0 12px 20px; font-size:14.5px}
+.timeline li::before{content:""; position:absolute; left:-7px; top:10px; width:12px; height:12px; border-radius:50%; background:var(--bg); border:2px solid var(--purple)}
+.timeline li.key::before{background:var(--purple)}
+.timeline b{display:inline-block; min-width:120px; font-variant-numeric:tabular-nums}
+
+/* research: map + ladder + chips */
+.map{display:grid; grid-template-columns:110px 1fr 1fr; gap:8px; margin:16px 0; font-size:14px}
+.map .ax{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); align-self:center}
+.map .ax.top{text-align:center; align-self:end}
+.cell{border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--card); min-width:0}
+.cell b{display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px}
+.cell.hot{border:2px solid var(--purple); background:var(--bg-soft)}
+.cell .aol{display:inline-block; margin-top:6px; background:var(--purple); color:var(--on-accent); border-radius:6px; padding:2px 8px; font-weight:600; font-size:13px}
+@media (max-width:620px){ .map{grid-template-columns:1fr 1fr} .map .ax.side,.map .corner{display:none} }
+.ladder{list-style:none; margin:14px 0; padding:0; font-size:14px}
+.ladder li{display:grid; grid-template-columns:150px 1fr; gap:12px; padding:6px 0; border-bottom:1px solid var(--line)}
+.ladder li.me{background:var(--bg-soft); border-radius:6px; padding-inline:8px; font-weight:600; border-bottom-color:transparent}
+.ladder .px{font-variant-numeric:tabular-nums; color:var(--muted)}
+.ladder li.me .px{color:var(--purple-ink)}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+.chip{border:1px solid var(--line); border-radius:999px; padding:4px 12px; font-size:13.5px; background:var(--card)}
+.chip.l{border-style:dashed; color:var(--muted)}
+
+/* personas */
+.personas{display:grid; gap:18px; margin:20px 0}
+.persona{border:1px solid var(--line); border-radius:14px; background:var(--card); overflow:hidden}
+.persona > header{display:grid; grid-template-columns:auto 1fr auto; gap:4px 16px; align-items:center; padding:16px 20px; border-bottom:1px solid var(--line); background:var(--bg-soft)}
+.persona .mono{width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:"Lora",Georgia,serif; font-size:22px; color:var(--on-accent); background:var(--purple); grid-row:span 2}
+.persona.s .mono{background:var(--night)}
+.persona.warm .mono{background:var(--dawn); color:var(--ink)}
+.persona h3{margin:0; font-family:"Lora",Georgia,serif; font-weight:500; font-size:22px}
+.persona .who{color:var(--muted); font-size:14px; grid-column:2}
+.persona .door{grid-column:3; grid-row:1 / span 2; text-align:right}
+.persona .quote{font-family:"Lora",Georgia,serif; font-style:italic; font-size:18px; padding:16px 20px 0; margin:0; max-width:none}
+.pgrid{display:grid; grid-template-columns:1fr 1fr; gap:4px 28px; padding:8px 20px 18px}
+.pgrid dl{margin:0}
+.pgrid dt{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:14px 0 3px}
+.pgrid dd{margin:0; font-size:14.5px}
+.pgrid .full{grid-column:1 / -1}
+.persona footer{border-top:1px solid var(--line); padding:12px 20px; font-size:12.5px; color:var(--muted)}
+@media (max-width:640px){ .pgrid{grid-template-columns:1fr} .persona > header{grid-template-columns:auto 1fr} .persona .door{grid-column:1 / -1; grid-row:auto; text-align:left} }
+
+/* strategy */
+.thesis{background:var(--bg-soft); border:1px solid var(--line); border-radius:12px; padding:22px 26px; margin:24px 0}
+.thesis p{font-family:"Lora",Georgia,serif; font-size:21px; line-height:1.45; margin:0; max-width:none}
+.thesis small{display:block; margin-top:10px; color:var(--muted); font-size:13.5px; font-family:"Work Sans",system-ui,sans-serif}
+.pillars{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin:18px 0}
+.pillar{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+.pillar b{display:block; font-size:14.5px; margin-bottom:4px}
+.pillar span{font-size:13.5px; color:var(--muted)}
+.angles{display:grid; gap:10px; margin:14px 0}
+.angle{border:1px solid var(--line); border-radius:10px; padding:12px 16px; background:var(--card)}
+.angle b{display:block}
+.angle q{display:block; font-family:"Lora",Georgia,serif; font-style:italic; margin-top:4px; quotes:none}
+
+/* measurement */
+.spine{display:grid; gap:10px; margin:18px 0 0}
+.key{display:grid; grid-template-columns:160px 1fr; gap:4px 18px; background:var(--card); border:1px solid var(--line); border-left:4px solid var(--purple); border-radius:8px; padding:12px 16px}
+.key b{font-size:14.5px}
+.key small{grid-column:1; color:var(--muted); font-size:12.5px}
+.key p{grid-column:2; grid-row:1 / span 2; margin:0; font-size:14.5px; min-width:0; max-width:none}
+@media (max-width:560px){ .key{grid-template-columns:1fr} .key p{grid-column:1; grid-row:auto} }
+.stage{display:grid; grid-template-columns:34px 190px 1fr; gap:4px 16px; padding:16px 0; border-top:1px solid var(--line)}
+.stage:last-of-type{border-bottom:1px solid var(--line)}
+.stage .n{font-family:"Lora",Georgia,serif; font-size:20px; color:var(--purple-ink); font-variant-numeric:tabular-nums}
+.stage h3{margin:0; font-size:16px}
+.stage .where{color:var(--muted); font-size:13px; margin-top:2px}
+.stage .what{min-width:0; font-size:14.5px}
+.stage .what ul{margin:0; padding-left:18px}
+.stage .what li{margin:3px 0}
+@media (max-width:640px){ .stage{grid-template-columns:34px 1fr} .stage .what{grid-column:2} }
+.check{list-style:none; padding:0; margin:10px 0}
+.check li{position:relative; padding:5px 0 5px 28px; font-size:15px; max-width:74ch}
+.check li::before{content:""; position:absolute; left:2px; top:11px; width:13px; height:13px; border:2px solid var(--purple); border-radius:3px}
+
+/* plan: gantt */
+.gantt{display:grid; grid-template-columns:190px repeat(18,minmax(36px,1fr)); row-gap:7px; min-width:880px; font-size:12px; padding:4px 0}
+.gantt .wk{font-size:10.5px; color:var(--muted); text-align:left; padding:0 0 4px 4px; border-left:1px solid var(--line); font-variant-numeric:tabular-nums; white-space:nowrap}
+.gantt .lab{grid-column:1; font-size:13px; font-weight:500; padding-right:12px; align-self:center; line-height:1.25}
+.bar{height:24px; border-radius:6px; align-self:center; padding:0 7px; display:flex; align-items:center; white-space:nowrap; overflow:hidden; font-size:11px; font-weight:500; min-width:0}
+.bar.prep{background:var(--bg-soft); border:1px solid var(--purple); color:var(--ink)}
+.bar.build{background:var(--purple); color:var(--on-accent)}
+.bar.hold{background:repeating-linear-gradient(45deg,var(--bg-soft) 0 5px,var(--line) 5px 10px); color:var(--muted); border:1px solid var(--line)}
+.bar.live{background:var(--ok); color:var(--on-accent)}
+.bar.sustain{background:var(--gold-soft); border:1px solid var(--warn); color:var(--ink)}
+footer.page{margin-top:72px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:13px}
+footer.page p{max-width:none}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+</style>
+
+</head>
+<body>
+<header class="gutter">
+  <div class="wrap">
+    <p class="eyebrow">Resolve to Rest · New Year 2027 · Art of Living</p>
+    <h1>Sleep &amp; Anxiety Protocol</h1>
+    <p class="lede">Everything for the NY2027 campaign in one place: the project plan, the research, the audience, the creative strategy and the measurement system behind 100 registrations by March 14, 2027. Updated November 24, 2026.</p>
+  </div>
+</header>
+
+<nav class="tabs gutter" aria-label="Workspace sections">
+  <div class="wrap">
+    <a href="#overview">Overview</a>
+    <a href="#plan">Plan</a>
+    <a href="#research">Research</a>
+    <a href="#current">Current state</a>
+    <a href="#personas">Personas</a>
+    <a href="#strategy">Strategy</a>
+    <a href="#measurement">Measurement</a>
+  </div>
+</nav>
+
+<main class="gutter">
+<div class="wrap">
+
+<!-- ================================================================ OVERVIEW -->
+<section id="overview" data-view>
+  <h2>Overview</h2>
+  <div class="stats">
+    <div class="stat"><b>100</b><span>completed registrations by Mar 14, 2027, starting from zero</span></div>
+    <div class="stat"><b>≤ $60</b><span>cost per registration (~$6,000 media)</span></div>
+    <div class="stat"><b>$149</b><span>3-day live online course, 2.5 hrs/day, HSA/FSA eligible</span></div>
+    <div class="stat"><b>Jan 1</b><span>ads live; peak to Feb 7, sustain to Mar 14</span></div>
+  </div>
+  <p class="secnote"><b>Links.</b> <b>Landing page:</b> <a href="https://sumeru-design.github.io/MASA-LP/" target="_blank" rel="noopener">sumeru-design.github.io/MASA-LP</a>, a GitHub Pages preview built from the <a href="https://github.com/Sumeru-Design/MASA-LP" target="_blank" rel="noopener">MASA-LP repo</a>. It goes live on Unbounce at event.us.artofliving.org/lp1/sleep-anxiety-protocol. The preview is current as of Nov 18. <b>Landing page design:</b> <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=28-364" target="_blank" rel="noopener">Figma</a>, the source of truth for how the page looks (desktop and mobile); changes start there. <b>Ad creatives:</b> <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=0-1" target="_blank" rel="noopener">Figma</a>. <b>List emails:</b> <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=67-461" target="_blank" rel="noopener">Figma</a>.</p>
+
+  <h3>The funnel</h3>
+  <p class="secnote">Revised from your original flow. The landing page now has one goal, registration. Follow-up with non-buyers moves to the checkout, which already asks for an email before payment.</p>
+  <div class="flow" role="img" aria-label="Funnel: paid ads, list emails and organic posts lead to one landing page with a hero A/B test, then course select, then checkout, then purchase. Checkout abandoners get a 3-email follow-up that returns them to checkout. Buyers get pre-course emails, the Sattva app and a path to Part 1.">
+    <div class="flowrow">
+      <div class="node"><b>Meta ads</b><span>two audiences: 3 AM Waker, Wired &amp; Tired</span></div>
+      <div class="node"><b>YouTube</b><span>optional, recuts of the motion videos</span></div>
+      <div class="node"><b>AOL list + challenge list</b><span>2–4 emails, warm audiences</span></div>
+      <div class="node"><b>Organic posts</b><span>8 scheduled posts</span></div>
+    </div>
+    <div class="flowrow">
+      <span class="arrow" aria-hidden="true">↓</span>
+      <div class="node"><b>Landing page</b><span>one page · A/B test on the hero section · one button</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node"><b>Course select</b><span>members.us, filtered to the visitor's time zone</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node"><b>Checkout</b><span>email first, then payment (Stripe, Flex HSA/FSA)</span></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node goal"><b>Registration</b><span>the one goal</span></div>
+    </div>
+    <div class="flowrow">
+      <div class="node loop"><b>Started checkout, didn't finish</b><span>3 follow-up emails (1 hour, day 1, day 3) back to checkout</span></div>
+      <div class="node loop"><b>After registering</b><span>prep emails, Sattva app for Yoga Nidra, then the Part 1 path</span></div>
+    </div>
+  </div>
+
+  <h3>Where things stand</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Work</th><th>Status</th><th>Where it lives</th></tr>
+    <tr><td class="k">Audit of the two live landing pages</td><td><span class="pill done">Done</span> Aug 26</td><td><code>audit/</code> · summary in <a href="#current">Current state</a></td></tr>
+    <tr><td class="k">New landing page build</td><td><span class="pill done">Revised</span> Nov 13</td><td><code>landing/</code>. Single-goal version built locally, with verified third-party research and our own participant-survey numbers in the evidence section; not ported to Unbounce yet. The second hero for the A/B test, the Jan–Mar dates and 17 <code>[CONFIRM]</code> items remain. See <a href="#s-lp">Strategy → Landing page</a>.</td></tr>
+    <tr><td class="k">Project plan: assets, timeline, resources</td><td><span class="pill done">Done</span> Nov 13</td><td><a href="#plan">Plan</a>. Jan 1 launch; written for the Turnkey kickoff.</td></tr>
+    <tr><td class="k">Market research</td><td><span class="pill done">Done</span> Nov 13</td><td><a href="#research">Research</a></td></tr>
+    <tr><td class="k">Platform, ads and tech-stack review</td><td><span class="pill done">Done</span> Nov 13</td><td><a href="#current">Current state</a></td></tr>
+    <tr><td class="k">Personas</td><td><span class="pill done">Done</span> Nov 13</td><td><a href="#personas">Personas</a></td></tr>
+    <tr><td class="k">Creative strategy</td><td><span class="pill done">v2</span></td><td><a href="#strategy">Strategy</a></td></tr>
+    <tr><td class="k">Measurement plan</td><td><span class="pill done">v2</span></td><td><a href="#measurement">Measurement</a></td></tr>
+    <tr><td class="k">Ad creative, copy deck, emails</td><td><span class="pill next">Drafted</span> Nov 18–20</td><td>Ad concepts and the four warm-list emails are drafted in Figma. Copy deck and the checkout follow-up emails are not started; production Nov 30 – Dec 11 (<a href="#p-assets">asset list</a>)</td></tr>
+    <tr><td class="k">Pre-launch tracking fixes</td><td><span class="pill todo">Next</span></td><td><a href="#m-fixes">Measurement → Pre-launch fixes</a></td></tr>
+  </table></div>
+
+  <h3>Decisions needed</h3>
+  <div class="risk"><span class="sev crit">Now</span><p><b>Meta health classification.</b>Check in Events Manager whether the pixel is marked health-related. If it is, Meta can block optimizing for purchases, and the brief's plan to switch to purchase optimization fails.</p></div>
+  <div class="risk"><span class="sev crit">Now</span><p><b>One GA4 property and one Meta pixel</b> for this campaign, out of the 3 and 5 currently installed.</p></div>
+  <div class="risk"><span class="sev warn">Nov 24</span><p><b>From the brief:</b> the ~$6,000 media budget; the offer price and deadline (including whether the $449 strikethrough stays); January–March course dates with 100+ seats; usage rights for testimonials and the existing video.</p></div>
+  <div class="risk"><span class="sev warn">Dec 4</span><p><b>Wording for "HSA/FSA eligible",</b> confirmed with counsel (see the IRS note in <a href="#r-market">Research</a>).</p></div>
+  <div class="risk"><span class="sev warn">Nov 24</span><p><b>Coordination with Part 1 campaigns:</b> audience exclusions, frequency, and the graduate path from this course into Part 1.</p></div>
+
+  <h3>Timeline</h3>
+  <ul class="timeline">
+    <li class="key"><b>Week of Nov 16</b> Turnkey kickoff; Meta health check; access granted</li>
+    <li class="key"><b>Nov 24</b> Approval 1: concept, audiences, budget, offer</li>
+    <li><b>Nov 30 – Dec 11</b> Produce the ads, emails and the landing page with both heroes; tracking fixes</li>
+    <li class="key"><b>Dec 14 / 16 / 17</b> Approval 2 · tracking QA gate · ads submitted to Meta</li>
+    <li><b>Dec 21 – Jan 1</b> Holiday freeze, monitoring only</li>
+    <li class="key"><b>Jan 1</b> Ads live · Jan 4 list email · Jan 8 Quitters' Day pivot</li>
+    <li><b>Jan 10 / 24, Feb 7 / 21</b> Checkpoints: 10 / 35 / 55 / 75 registrations</li>
+    <li class="key"><b>Mar 14</b> Goal: 100 registrations</li>
+    <li><b>Mar 19</b> Wrap report</li>
+    <li>Full plan in <a href="#plan">Plan</a></li>
+  </ul>
+
+  <h3>Source material</h3>
+  <ul class="tight">
+    <li>Creative brief: <code>AOL_Sleep_Protocol_NY2027_Lean_B_Stock_Imagery.docx</code> (Lean Version B, stock imagery)</li>
+    <li>Landing page audit: <code>audit/src/data.ts</code> (audited Aug 26, 2026)</li>
+    <li>New landing page: <code>landing/</code>, including <code>README.md</code>, the port guide <code>UNBOUNCE.md</code>, and <code>assets/js/aol.js</code></li>
+    <li>Live pages: <code>event.us.artofliving.org/us-en/lp1/sleep-anxiety-protocol/</code> (Unbounce) · <code>members.us.artofliving.org/us-en/courses/sleep-anxiety</code> (registration)</li>
+  </ul>
+</section>
+
+<!-- ================================================================ PLAN -->
+<section id="plan" data-view>
+  <h2>Project plan</h2>
+  <p class="secnote">Every asset we produce, when it ships, and who produces it, for a <b>January 1, 2027</b> launch on the New Year wave. Written for the kickoff with Turnkey. This replaces the brief's Jan 4 kickoff / Jan 25 launch: production moves into November and December, and the holidays are kept for monitoring only.</p>
+  <nav class="inner" aria-label="Plan sections"><span>Jump to</span><a href="#p-gantt">Timeline</a><a href="#p-assets">Assets</a><a href="#p-lp">Landing page test</a><a href="#p-dates">Key dates</a><a href="#p-resources">Resources</a><a href="#p-budget">Budget</a><a href="#p-turnkey">Turnkey kickoff</a><a href="#p-risks">Risks</a></nav>
+
+  <div class="stats">
+    <div class="stat"><b>Jan 1</b><span>ads live, 12:01 AM ET (a Friday)</span></div>
+    <div class="stat"><b>Dec 17</b><span>all ads submitted to Meta review, before the holiday slowdown</span></div>
+    <div class="stat"><b>2 weeks</b><span>production window, Nov 30 – Dec 11</span></div>
+    <div class="stat"><b>10 weeks</b><span>in flight to the Mar 14 goal (the brief had 7)</span></div>
+  </div>
+
+  <div class="callout">
+    <p><b>Why January 1 works, and what it costs.</b> Resolution intent peaks in the first week of January. Every employee's full FSA election becomes available on Jan 1. And ad prices usually drop after Christmas. A Jan 1 launch catches all three and gives three extra weeks to reach 100 registrations.</p>
+    <p>The cost: the brief kept everyone off work over the holidays by starting Jan 4. This plan keeps that spirit by finishing everything by <b>Dec 18</b>. Dec 21 – Jan 1 is monitoring only, by whoever Turnkey has on call.</p>
+  </div>
+
+  <h3 id="p-gantt">Timeline</h3>
+  <div class="tblwrap">
+    <div class="gantt" role="img" aria-label="Gantt chart, weeks of Nov 16 2026 to Mar 15 2027. Kickoff and decisions Nov 16 to 27; concept and copy Nov 16 to Dec 4; tracking fixes Nov 16 to Dec 11; cohort scheduling Nov 16 to Dec 4; production of creative, emails and landing page Nov 30 to Dec 11; approval, QA, campaign build and Meta review Dec 14 to 22; holiday freeze Dec 21 to 27; peak flight Jan 1 to Feb 7; sustain Feb 8 to Mar 14; weekly reconciliation Jan 4 onward; wrap report week of Mar 15.">
+      <span></span>
+      <span class="wk">Nov 16</span><span class="wk">23</span><span class="wk">30</span><span class="wk">Dec 7</span><span class="wk">14</span><span class="wk">21</span><span class="wk">28</span><span class="wk">Jan 4</span><span class="wk">11</span><span class="wk">18</span><span class="wk">25</span><span class="wk">Feb 1</span><span class="wk">8</span><span class="wk">15</span><span class="wk">22</span><span class="wk">Mar 1</span><span class="wk">8</span><span class="wk">15</span>
+
+      <span class="lab">Kickoff, decisions, Approval 1</span><span class="bar prep" style="grid-column:2/4">by Nov 24</span>
+      <span class="lab">Concept, stock, copy deck</span><span class="bar prep" style="grid-column:2/5">deck by Dec 4</span>
+      <span class="lab">Course dates Jan–Mar</span><span class="bar prep" style="grid-column:2/5">by Dec 4</span>
+      <span class="lab">Tracking fixes (pixel, GA4, Salesforce)</span><span class="bar build" style="grid-column:2/6">by Dec 11</span>
+      <span class="lab">Ad creative production</span><span class="bar build" style="grid-column:4/6">2–3 videos + statics</span>
+      <span class="lab">Emails</span><span class="bar build" style="grid-column:4/6">7–9 emails</span>
+      <span class="lab">Landing page + hero B, port</span><span class="bar build" style="grid-column:4/6">1 page, A/B hero</span>
+      <span class="lab">Approval 2, QA, submit to Meta (Dec 17)</span><span class="bar build" style="grid-column:6/8">Dec 14–22</span>
+      <span class="lab">Holiday freeze</span><span class="bar hold" style="grid-column:7/8"></span>
+      <span class="lab">Peak flight (pivot Jan 8)</span><span class="bar live" style="grid-column:8/14">Live Jan 1 → Feb 7</span>
+      <span class="lab">Sustain</span><span class="bar sustain" style="grid-column:14/19">Feb 8 → Mar 14</span>
+      <span class="lab">Weekly reconciliation</span><span class="bar prep" style="grid-column:9/19">every Monday</span>
+      <span class="lab">Wrap report (Mar 19)</span><span class="bar prep" style="grid-column:19/20"></span>
+    </div>
+  </div>
+  <p class="src">Thanksgiving (Nov 26–27) falls inside the concept phase; Approval 1 sits before it on purpose.</p>
+
+  <h3 id="p-assets">Asset inventory</h3>
+  <p class="secnote"><b>The number of ad creatives is open until the Turnkey meeting.</b> What's set: at most 2–3 motion videos, 1 landing page with an A/B test on the hero section, 7–9 emails and 9 organic posts. Statics, carousel and retargeting cards are sized with Turnkey; concepts for them are already drafted in Figma. Each ad's name is its <code>utm_content</code> value, so results report back by name. Concepts are in <a href="#s-ads">Strategy → Ad creative system</a>.</p>
+  <div class="tblwrap"><table>
+    <tr><th>#</th><th>Asset</th><th>Quantity · formats</th><th>Owner</th><th>Due</th></tr>
+    <tr><td class="k" colspan="5">A · Paid social (Meta: Instagram + Facebook)</td></tr>
+    <tr><td class="num">A1</td><td><b>Dynamic motion videos</b>, 15 seconds<br><span class="src">pick from vid15-307am-s, vid15-offswitch-w, vid15-mechanism-w, vid15-firstnight-s</span></td><td><b>2–3 max</b> · 9:16, 1:1, 4:5 = up to 9 files</td><td>Designer / editor</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">A2</td><td><b>Static ads</b><br><span class="src">concepts drafted in Figma: 6 type-led (static-pair-1s, static-pair-3w, static-skill, static-newyear, static-quitters, statcard-1) and 5 photo versions</span></td><td><span class="uv">TBD with Turnkey</span> · from 1:1, 4:5, 9:16, 1.91:1</td><td>Designer · AOL marketing to license photos or supply released ones</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">A3</td><td><b>Carousel</b>, "3 days, 3 shifts" <span class="uv">optional</span></td><td><span class="uv">TBD with Turnkey</span> · 5 slides, 1:1</td><td>Designer, with curriculum check by course ops</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">A4</td><td><b>Retargeting cards</b>: participant quotes (needs consent) and survey numbers as type</td><td><span class="uv">TBD with Turnkey</span> · 1:1, 9:16</td><td>Designer · survey cleared Nov 18</td><td class="num">Jan 8</td></tr>
+    <tr><td class="num">A5</td><td><b>Creator partnership ads</b> <span class="uv">optional</span></td><td>1–2 · 9:16</td><td>Turnkey + AOL (AOL already runs these with creators)</td><td class="num">Jan 8</td></tr>
+    <tr><td class="num">A6</td><td><b>Ad copy deck</b>: primary text, headlines, descriptions</td><td>Sized to the creatives agreed with Turnkey: per audience and phase, primary texts and headlines, plus a retargeting set and an evergreen set for any December warm-up</td><td>Copywriter</td><td class="num">Dec 4</td></tr>
+    <tr><td class="num">A7</td><td><b>YouTube Shorts</b> <span class="uv">optional</span></td><td>Recuts of the motion videos · 9:16</td><td>Designer / editor</td><td class="num">Dec 11</td></tr>
+    <tr><td class="k" colspan="5">B · Landing page and organic</td></tr>
+    <tr><td class="num">B1</td><td><b>Landing page</b>, one page for all traffic. Hero A: "Stop Waking Up at 3 AM"</td><td>Built in <code>landing/</code>; design in Figma. 17 <code>[CONFIRM]</code> items to clear</td><td>Copywriter + AOL owner</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">B2</td><td><b>Hero B</b>, the challenger for the A/B test</td><td>One change from hero A (see <a href="#p-lp">below</a>) · <span class="uv">what to test: TBD</span></td><td>Copywriter + designer</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">B3</td><td><b>Unbounce port, A/B setup + QA</b></td><td>1 URL, 50/50 split on the hero · acceptance checklist in <code>UNBOUNCE.md</code></td><td>Unbounce builder</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">B4</td><td><b>Real AOL photography</b> for the 4 stock stand-ins</td><td>4 images (list in <code>landing/IMAGES.md</code>)</td><td>AOL marketing</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">B5</td><td><b>Organic posts</b> on AOL Instagram + Facebook</td><td>8 posts (Jan 1 – Feb 28) + 1 teaser (Dec 30), reusing the ads</td><td>Designer schedules</td><td class="num">Dec 18</td></tr>
+    <tr><td class="k" colspan="5">C · Email (HubSpot)</td></tr>
+    <tr><td class="num">C1</td><td><b>blast1</b> to the AOL list + breathing-challenge list: "This year, start with rest"</td><td>1 email · designed in <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=67-461" target="_blank" rel="noopener">Figma</a> (Nov 20)</td><td>Copywriter + HubSpot admin</td><td class="num">Sends Jan 4</td></tr>
+    <tr><td class="num">C1b</td><td><b>quitters</b> <span class="uv">optional</span>: "The resolution that asks you to do less"</td><td>1 email · designed in Figma</td><td>Copywriter + HubSpot admin</td><td class="num">Sends Jan 11</td></tr>
+    <tr><td class="num">C1c</td><td><b>results</b> <span class="uv">optional</span>: "What three days actually changed" (participant survey, no anxiety %)</td><td>1 email · designed in Figma</td><td>Copywriter + HubSpot admin</td><td class="num">Sends Jan 25</td></tr>
+    <tr><td class="num">C2</td><td><b>blast2</b>: the next real cohort dates</td><td>1 email · designed in Figma, dates still [CONFIRM]</td><td>Copywriter + HubSpot admin</td><td class="num">Sends ~Feb 8</td></tr>
+    <tr><td class="num">C3</td><td><b>Started checkout, didn't finish</b>: ac1-seat, ac2-dates, ac3-offer</td><td>3 emails + workflow (1 hour, day 1, day 3)</td><td>Copywriter + HubSpot admin</td><td class="num">Live Dec 18</td></tr>
+    <tr><td class="num">C4</td><td><b>After registering</b>: pp1-prep (with Sattva app links), pp2-next (Part 1 path)</td><td>2 emails + workflow</td><td>Copywriter + HubSpot admin</td><td class="num">Live Dec 18</td></tr>
+    <tr><td class="k" colspan="5">D · Tracking and operations: not creative, but the launch depends on them</td></tr>
+    <tr><td class="num">D1</td><td><b>Meta health classification check</b></td><td>Events Manager → data source settings</td><td>Turnkey + AOL</td><td class="num">Nov 20</td></tr>
+    <tr><td class="num">D2</td><td><b>One Meta pixel, one GA4 property</b>; extra pixels off this page; <code>sleep_course_purchase</code> verified</td><td>GTM-KFJ8G2M</td><td>Analytics / GTM owner</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">D3</td><td><b>UTMs + page variant stored on the Salesforce order</b>; consent boxes unticked; "3 hours" copy fixed</td><td>members.us change</td><td>members.us dev team</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">D4</td><td><b>Checkout email reaches HubSpot</b>, to trigger C3</td><td>Verify collected-forms capture, or sync from Salesforce</td><td>HubSpot admin</td><td class="num">Dec 11</td></tr>
+    <tr><td class="num">D5</td><td><b>Course dates Jan 4 – Mar 20</b>, 100+ seats; mornings, evenings, weekends; Eastern, Central and Pacific</td><td>Published on members.us</td><td>Course operations</td><td class="num">Dec 4</td></tr>
+    <tr><td class="num">D6</td><td><b>Weekly report</b> reconciled to Salesforce orders</td><td>Template + Monday cadence</td><td>Turnkey</td><td class="num">Jan 4</td></tr>
+  </table></div>
+
+  <h3 id="p-lp">Landing page: one page, A/B test on the hero</h3>
+  <p>All traffic (ads, emails, organic) goes to <b>one landing page</b>. Unbounce splits visitors 50/50 between two heroes; everything below the hero stays identical. <code>aol_variant</code> records which hero each visitor saw (<code>a</code> or <code>b</code>), all the way to the Salesforce order.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Arm</th><th>Hero</th><th>Traffic</th><th><code>aol_variant</code></th></tr>
+    <tr><td class="k">A</td><td>The current hero: "Stop Waking Up at 3 AM", the photo reel, the participant line</td><td>50%</td><td><code>a</code></td></tr>
+    <tr><td class="k">B</td><td>One change from A, to be decided. The ready candidate is the headline "Switch Off the Racing Mind", which speaks to the Wired &amp; Tired audience</td><td>50%</td><td><code>b</code></td></tr>
+  </table></div>
+  <p><b>How to read it.</b> At ~2,000–4,000 sessions for the whole flight, the test can't pick a winner on registrations; that would need about 12,000–14,000 visitors per arm. Judge it instead on the hero button's click-through to course select (the <code>aol_cta</code> event), which happens far more often. At a ~20% click rate, spotting a lift to 25% takes about 1,100 visitors per arm, which the January budget reaches. Registrations by arm are reported too, as a check.</p>
+  <p><b>Change one thing.</b> The old page's test varied six things at once and couldn't explain its result. Hero B changes one element: the headline, or the image, not both.</p>
+
+  <h3 id="p-dates">Key dates</h3>
+  <ul class="timeline">
+    <li class="key"><b>Week of Nov 16</b> Turnkey kickoff; access granted; Meta health check (D1); dev and course-ops requests filed</li>
+    <li class="key"><b>Tue Nov 24</b> Approval 1: concept, audiences, stock selects, copy direction, budget, offer</li>
+    <li><b>Nov 26–27</b> Thanksgiving</li>
+    <li><b>Fri Dec 4</b> Copy deck final; Jan–Mar course dates published</li>
+    <li><b>Fri Dec 11</b> All assets, emails and the landing page with both heroes delivered; tracking fixes done</li>
+    <li class="key"><b>Mon Dec 14</b> Approval 2: final assets</li>
+    <li class="key"><b>Wed Dec 16</b> Tracking QA gate (checklist in <a href="#m-qa">Measurement</a>)</li>
+    <li class="key"><b>Thu Dec 17</b> Campaigns built and all ads submitted to Meta review</li>
+    <li><b>Fri Dec 18</b> Email workflows live; organic posts scheduled; last day of build</li>
+    <li><b>Dec 21 – Jan 1</b> Holiday freeze. Fix only Meta review rejections. Optional warm-up from Sat Dec 26 (see Budget)</li>
+    <li class="key"><b>Fri Jan 1</b> Ads live, 12:01 AM ET. Creative phase 1: "Start the year with rest"</li>
+    <li><b>Mon Jan 4</b> blast1 to the AOL list and challenge list; first weekly reconciliation; first cohorts start this week</li>
+    <li class="key"><b>Fri Jan 8</b> Quitters' Day: switch copy to phase 2, "The resolution that asks you to do less"</li>
+    <li><b>Mid-January</b> Switch to purchase optimization at 15–20 registrations, if Meta's classification allows it; retargeting with quote cards</li>
+    <li><b>~Mon Feb 8</b> blast2 with real cohort dates</li>
+    <li class="key"><b>Sun Mar 14</b> Goal: 100 registrations</li>
+    <li><b>Fri Mar 19</b> Wrap report</li>
+  </ul>
+  <p>Pace checks, re-based for the longer flight (the brief's were 15 / 50 / 75 / 100 from a Jan 25 start):</p>
+  <div class="tblwrap"><table>
+    <tr><th>Checkpoint</th><th class="num">Cumulative registrations</th><th>If behind</th></tr>
+    <tr><td>Sun Jan 10</td><td class="num">10</td><td>Fix landing page or checkout friction; check the checkout-follow-up recovery rate</td></tr>
+    <tr><td>Sun Jan 24</td><td class="num">35</td><td>Move budget to the top 2 ads and the stronger audience</td></tr>
+    <tr><td>Sun Feb 7</td><td class="num">55</td><td>Add creator ads (A5) if not running; widen retargeting</td></tr>
+    <tr><td>Sun Feb 21</td><td class="num">75</td><td>blast2 follow-up; review cohort times against demand</td></tr>
+    <tr><td>Sun Mar 14</td><td class="num">100</td><td>Final push with real cohort dates</td></tr>
+  </table></div>
+
+  <h3 id="p-resources">Resources</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Role</th><th>Who</th><th>Does</th><th>Effort</th></tr>
+    <tr><td class="k">Marketing owner</td><td>AOL</td><td>Decisions, the two approvals, coordination across everyone below, weekly review with Turnkey</td><td>~3 hrs/week; more in kickoff week</td></tr>
+    <tr><td class="k">Paid media</td><td><b>Turnkey</b></td><td>Meta (and optional YouTube) strategy, campaign build, audiences and exclusions, pixel and Conversions API QA with the analytics owner, Meta review, creative rotation, budget pacing, weekly report reconciled to Salesforce, launch-week and holiday monitoring</td><td>Per Turnkey's scope; heaviest Dec 14 – Jan 15</td></tr>
+    <tr><td class="k">Designer / video editor</td><td>Freelance or Turnkey's studio</td><td>Build the 2–3 videos, the statics agreed with Turnkey and hero B; license stock; schedule B5</td><td>Set by the creative count. The brief's 17 assets would take ~12 days, so plan for 2 people if the count stays near that</td></tr>
+    <tr><td class="k">Copywriter</td><td>Freelance</td><td>Copy deck A6, the emails, hero B copy, landing page <code>[CONFIRM]</code> copy</td><td>~4–5 days</td></tr>
+    <tr><td class="k">Certified instructor</td><td>AOL</td><td>Check the carousel, the videos' course claims and the emails against the curriculum</td><td>~2 hours</td></tr>
+    <tr><td class="k">Course operations</td><td>AOL</td><td>Jan 4 – Mar 20 cohort schedule with 100+ seats; teachers for the first week of January</td><td>By Dec 4</td></tr>
+    <tr><td class="k">members.us developer</td><td>AOL</td><td>Store UTMs and page variant on the Salesforce order; untick consent boxes; fix "3 hours"; fix the "Protocal" nav typo</td><td>~1–3 dev days</td></tr>
+    <tr><td class="k">Analytics / GTM owner</td><td>AOL (or Turnkey)</td><td>One pixel and one GA4 property; verify the purchase event; review the two unknown ad domains in GTM</td><td>~2 days</td></tr>
+    <tr><td class="k">HubSpot admin</td><td>AOL</td><td>Three workflows (list, checkout follow-up, after registering); checkout email capture</td><td>~2 days</td></tr>
+    <tr><td class="k">Unbounce builder</td><td>AOL or freelance</td><td>Port the page, set up the 50/50 hero test, switch off chat and popups, run the acceptance checklist</td><td>~1 day</td></tr>
+    <tr><td class="k">Legal / compliance</td><td>AOL counsel</td><td>"HSA/FSA eligible" wording (IRS IR-2024-65); claims review of ads, emails and landing page</td><td>2 review rounds: Dec 4 and Dec 14</td></tr>
+  </table></div>
+
+  <h3 id="p-budget">Budget</h3>
+  <p>The brief's <b>~$6,000 media budget</b> still works over 10 weeks. It is front-loaded into January, when intent is highest and ad prices are usually at their yearly low:</p>
+  <div class="tblwrap"><table>
+    <tr><th>Phase</th><th>Dates</th><th class="num">Media</th><th>Optimize to</th></tr>
+    <tr><td class="k">Warm-up <span class="uv">optional</span></td><td>Dec 26–31</td><td class="num">$400</td><td>Landing page views, evergreen 3 AM creative only, to build pixel signal before Jan 1. Starts after Christmas, once ad prices drop</td></tr>
+    <tr><td class="k">Peak, part 1</td><td>Jan 1–17</td><td class="num">$2,400</td><td>Landing page views; purchases once 15–20 sales are in</td></tr>
+    <tr><td class="k">Peak, part 2</td><td>Jan 18 – Feb 14</td><td class="num">$2,000</td><td>Purchases (if allowed); retargeting on</td></tr>
+    <tr><td class="k">Sustain</td><td>Feb 15 – Mar 14</td><td class="num">$1,200</td><td>Top 2 ads, retargeting, cohort dates</td></tr>
+    <tr><td class="k">Total</td><td></td><td class="num"><b>$6,000</b></td><td>At the brief's $60 target that is 100 registrations; ~85 paid, ~15 from lists and organic</td></tr>
+  </table></div>
+  <p><b>Outside media:</b> stock licenses (~15 photos and 8 video clips, per the brief; price on the chosen site), Turnkey's fee, freelance design and copy, and optional creator fees. None of these is quoted yet.</p>
+  <p class="src">Skip a December "use your FSA before it expires" angle. Expenses generally have to be incurred in the plan year, so paying in December for a January course likely wouldn't qualify. Counsel should confirm.</p>
+
+  <h3 id="p-turnkey">Turnkey kickoff: what to share and ask</h3>
+  <p><b>Share:</b> this workspace (Personas, Strategy and Measurement especially), the creative brief, and the UTM convention. Share it from the page's Share menu, since it's private until you do.</p>
+  <ul class="check">
+    <li><b>Health and wellness experience.</b> How have they handled Meta's health data restrictions? What do they do if purchase optimization is blocked?</li>
+    <li><b>Creative count.</b> How many ads do they recommend at a ~$6,000 budget across two audiences, and in which formats? Do they produce creative or only run media? Motion video is capped at 2–3. Whatever is agreed has to be ready by Dec 11.</li>
+    <li><b>Holiday cover.</b> Who watches the account on Jan 1 and through the first week? What is their response time?</li>
+    <li><b>Meta review.</b> Do they agree with submitting by Dec 17? How do they handle rejections over the holidays?</li>
+    <li><b>Structure.</b> Advantage+ or manual for two audiences? How will they keep the audiences in separate learning pools? Should we run the Dec 26 warm-up?</li>
+    <li><b>Part 1 overlap.</b> Who runs AOL's Part 1 ads? Part 1 will push New Year messaging too, so agree on exclusions and frequency caps.</li>
+    <li><b>Source of truth.</b> Will they report against Salesforce orders weekly, not just Ads Manager?</li>
+    <li><b>Access.</b> What do they need: Business Manager, ad account, pixel, GTM, GA4, HubSpot (read)?</li>
+    <li><b>Scope and fee.</b> Meta only, or YouTube too? What happens to the flight after Mar 14?</li>
+  </ul>
+
+  <h3 id="p-risks">Risks</h3>
+  <div class="risk"><span class="sev crit">High</span><p><b>Two-week production window, size still open.</b>Production runs Nov 30 – Dec 11, but the creative count isn't set until the Turnkey meeting. Mitigation: agree the count at that meeting, keep motion video to 2–3, start from the statics already drafted in Figma, and move retargeting cards (A4) to January, since retargeting starts mid-January anyway.</p></div>
+  <div class="risk"><span class="sev crit">High</span><p><b>Meta's health classification.</b>If the pixel is restricted, purchase optimization fails. Check it in the first week (D1) so there is time to adjust URLs, event names and the plan.</p></div>
+  <div class="risk"><span class="sev crit">High</span><p><b>No January cohorts.</b>Buyers on Jan 1 need a group starting that week. Course dates (D5) are on the critical path, due Dec 4.</p></div>
+  <div class="risk"><span class="sev warn">Medium</span><p><b>Meta review over the holidays.</b>Review slows in late December. Submitting by Dec 17 leaves two working days for rejections before the freeze.</p></div>
+  <div class="risk"><span class="sev warn">Medium</span><p><b>Launching on a holiday.</b>Jan 1 is a Friday holiday, and emails don't send until Mon Jan 4. Ads are scheduled ahead; Turnkey covers monitoring.</p></div>
+  <div class="risk"><span class="sev warn">Medium</span><p><b>Competing with Part 1.</b>AOL's Part 1 ads also name sleep and will push the New Year. Without exclusions, AOL pays twice for the same people.</p></div>
+  <div class="risk"><span class="sev ok">Low</span><p><b>Testimonial consent.</b>Quote cards need signed consent. If it doesn't arrive, retargeting runs on the survey-number cards and static ads instead.</p></div>
+</section>
+
+<!-- ================================================================ RESEARCH -->
+<section id="research" data-view>
+  <h2>Research</h2>
+  <p class="secnote">The US consumer sleep market, what people buy instead of a $149 live course, and how the category advertises. Researched Nov 13, 2026. Items marked unverified rest on a single or secondary source.</p>
+  <nav class="inner" aria-label="Research sections"><span>Jump to</span><a href="#r-findings">Key findings</a><a href="#r-survey">Participant survey</a><a href="#r-market">Market</a><a href="#r-alt">Alternatives</a><a href="#r-msg">Messaging</a></nav>
+
+  <h3 id="r-findings">Key findings</h3>
+  <div class="find">
+    <div class="fi"><span class="n">1</span><div><b>AOL holds an empty spot in the market.</b><p>Almost every alternative is self-serve (apps, supplements, devices) or long and expensive (MBSR $450–650 over 8 weeks, TM about $980). We found no other live, instructor-led, sleep-specific program under about $300. The closest substitutes are coached CBT-I programs: Sleep Reset ($297, HSA/FSA) and Stellar Sleep (about $60 a month).</p></div></div>
+    <div class="fi"><span class="n">2</span><div><b>Buyers already accept the method.</b><p>Meditation and breathwork are the most-tried sleep trend in the US (27% of adults, AASM, Dec 2025), ahead of sleepmaxxing (12%) and mouth taping (7%). AOL doesn't need to explain why breathing helps. It needs to explain why a live teacher is worth more than a free YouTube yoga nidra.</p></div></div>
+    <div class="fi"><span class="n">3</span><div><b>People describe the problem as a busy mind, and the core buyer is a woman aged 30–55.</b><p>63% of people who want more sleep are frequently stressed, and only 27% of women under 50 get enough sleep (Gallup). The fastest-growing supplement sales are calming ingredients: magnesium is up 33.5% and L-theanine 24%.</p></div></div>
+    <div class="fi"><span class="n">4</span><div><b>The tired messages are scores, percentages and pills.</b><p>Skepticism of melatonin is rising, 76% of adults have lost sleep worrying about their sleep, and only about 1 in 10 trust most health influencers (Pew 2026). A calm, human "skill you keep, not something you take" stands apart.</p></div></div>
+    <div class="fi"><span class="n">5</span><div><b>Meta's health-data rules are the biggest risk, and they affect ad buying more than copy.</b><p>A pixel classified as health-related can lose Purchase optimization. "Anxiety" in the URL and the HSA/FSA pitch are possible triggers.</p></div></div>
+  </div>
+
+
+  <h3 id="r-survey">Our own participant survey <span class="pill r" style="vertical-align:2px">New · Nov 18</span></h3>
+  <p class="secnote">From the national program coordinator: Art of Living's pre/post survey of Sleep &amp; Anxiety Protocol participants, April 2026. Matched pairs; anxiety measured on the full State-Trait Anxiety Inventory (STAI-S); paired t-tests and effect sizes. <b>Not peer reviewed, no control group, and the sleep questions are custom self-report items.</b> It is the only data on this course itself.</p>
+  <div class="find">
+    <div class="fi"><span class="n">1</span><div><b>Waking refreshed was the biggest change.</b><p>More than half of participants reported sleeping better on all three measures (falling asleep, staying asleep, waking refreshed), all statistically significant. Morning refreshedness moved most. That is direct evidence for the campaign's core idea: <a href="#s-spine">sell the morning, not the night</a>.</p></div></div>
+    <div class="fi"><span class="n">2</span><div><b>Anxiety came down, mostly as calm.</b><p>66% scored lower on the STAI after the course (medium effect size). 60% of those who arrived with frequent anxiety moved to a lower category. Physical tension and worry fell, and feelings of calm and ease rose. That fits the "busy mind" message for the Wired &amp; Tired audience.</p></div></div>
+    <div class="fi"><span class="n">3</span><div><b>People recommend it.</b><p>8.85 out of 10 likelihood to recommend, a Net Promoter Score of 57. This is a social-proof number that needs no testimonial consent and makes no health claim.</p></div></div>
+  </div>
+  <div class="tblwrap"><table>
+    <tr><th>Finding</th><th>Ads</th><th>Landing page</th><th>Emails</th></tr>
+    <tr><td class="k">More than half slept better; waking refreshed changed most</td><td><span class="pill s">Yes</span> As participant-reported, e.g. "More than half of participants said they woke up more refreshed."</td><td><span class="pill s">Live</span> Hero line + evidence panel</td><td><span class="pill s">Yes</span> ac2, blast1</td></tr>
+    <tr><td class="k">Calmer, less tension and worry</td><td><span class="pill s">Yes</span> As felt experience, e.g. "Participants said they felt calmer and more at ease." Fits <code>vid15-mechanism-w</code></td><td><span class="pill p">Optional</span></td><td><span class="pill s">Yes</span> ac2</td></tr>
+    <tr><td class="k">8.85/10 to recommend (NPS 57)</td><td><span class="pill s">Yes</span> Retargeting stat card: "Rated 8.85/10 by past participants"</td><td><span class="pill s">Live</span> Enrol card + evidence panel</td><td><span class="pill s">Yes</span> ac3</td></tr>
+    <tr><td class="k">66% lower anxiety (STAI)</td><td><span class="pill a">Avoid</span> An outcome claim about a mental-health condition. It needs stronger substantiation in an ad, and it pushes the account toward Meta's health classification</td><td><span class="pill s">Live</span> Evidence panel, with its limits stated</td><td><span class="pill p">Caveated</span> ac2, with the source line</td></tr>
+    <tr><td class="k">60% of frequent-anxiety participants moved down a category</td><td><span class="pill a">Avoid</span></td><td><span class="pill a">No</span> Too many numbers; small subgroup</td><td><span class="pill a">No</span></td></tr>
+    <tr><td class="k">"Same range as CBT-I"</td><td><span class="pill a">Never</span></td><td><span class="pill a">Never</span></td><td><span class="pill a">Never</span> Keep it spoken only. An uncontrolled survey can't support an efficacy comparison with a clinical treatment in writing, whoever approves it</td></tr>
+  </table></div>
+  <p><b>Cleared for use.</b> The national program coordinator confirmed on Nov 18 that all findings can be used. The rulings above still apply: they are about what each claim can support, not permission. <b>Worth asking for, but not blocking:</b></p>
+  <ul class="check">
+    <li><b>How many participants</b> (matched pairs) and how many cohorts? Adding "n = X" to the source line makes every claim stronger.</li>
+    <li><b>When was the post-survey taken?</b> End of day 3, or later? It changes whether we can say "after the course" or "weeks later."</li>
+    <li><b>The exact percentage for each sleep item</b>, so ads can say "X% woke more refreshed" instead of "more than half."</li>
+    <li><b>Response rate</b>, and whether these were US online cohorts.</li>
+    <li><b>Any follow-up data</b> (30 or 90 days), which would be the strongest claim available.</li>
+  </ul>
+  <p class="src">Counsel should review the ad lines with the HSA/FSA wording on Dec 4. Survey results describe what participants reported; they are not a promise of typical results.</p>
+
+  <h3 id="r-market">The US sleep market</h3>
+  <div class="stats">
+    <div class="stat"><b>18.1%</b><span>of US adults have trouble staying asleep most days</span><small>CDC/NCHS Data Brief 559, Apr 2026</small></div>
+    <div class="stat"><b>30.5%</b><span>sleep under 7 hours, rising to 33–35% at ages 35–64</span><small>CDC/NCHS, 2024 data</small></div>
+    <div class="stat"><b>57%</b><span>say they'd feel better with more sleep, the first majority since 2001</span><small>Gallup, 2024</small></div>
+    <div class="stat"><b>63%</b><span>of people who want more sleep are frequently stressed (vs 31% of those who sleep enough)</span><small>Gallup, 2024</small></div>
+    <div class="stat"><b>65–78%</b><span>have lost sleep over work thoughts or money worries</span><small>AASM survey, Jun 2025</small></div>
+    <div class="stat"><b>27%</b><span>of women under 50 get enough sleep, vs 46% of men</span><small>Gallup, 2024</small></div>
+  </div>
+  <p>Sleep and stress go together: the APA's 2026 poll names stress (48%) and sleep (38%) as the top two things Americans say affect their mental health. That supports selling sleep and anxiety as one course.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Segment</th><th class="num">US size</th><th>Trend</th><th>Source quality</th></tr>
+    <tr><td class="k">Total "sleep economy"</td><td class="num">$54–95B</td><td>Depends on whether mattresses and travel are counted</td><td><span class="uv">paid reports, conflicting</span></td></tr>
+    <tr><td class="k">Mattresses, pillows, sleep aids</td><td class="num">$23.1B</td><td>Largest product category</td><td>Paid report, 2025</td></tr>
+    <tr><td class="k">Sleep tech &amp; wearables</td><td class="num">~$8–9B</td><td>~18% a year. Oura sold about 3M rings in 2025 (~$908M revenue); Whoop is valued at about $10B.</td><td>Mixed; Oura from filings</td></tr>
+    <tr><td class="k">Magnesium (all uses)</td><td class="num">$1.96B</td><td><b>+33.5%</b>; glycinate +125% (2024)</td><td>SPINS scanner data, Oct 2026</td></tr>
+    <tr><td class="k">Sleep supplements</td><td class="num">$1.35B</td><td>+5.4%, but units are flat (−0.1%), so the growth is price, not new buyers</td><td>SPINS scanner data, Oct 2026</td></tr>
+    <tr><td class="k">OTC + Rx sleep aids (pharmacy)</td><td class="num">~$1.5–2B</td><td>Retail down about 3% the prior year</td><td>Mintel, 2025</td></tr>
+    <tr><td class="k">CBT-I with a clinician</td><td class="num">—</td><td>Very short supply: first session averages <b>$261</b>, and only 3.3% of providers taking new patients accept insurance</td><td>SLEEP 2025 abstract</td></tr>
+  </table></div>
+  <ul class="tight">
+    <li><b>Spending is modest per person.</b> 51% spent $100 or less on sleep products (excluding mattresses) last year, and men are more likely to spend $200–500 (AASM 2025). $149 needs a comparison: about two years of an app, or a little over half of one private CBT-I session.</li>
+    <li><b>People are trying things on their own and are frustrated.</b> 58% of people who know about online sleep hacks tried one, 80% wish their doctor gave them more sleep resources, and 45% have never discussed their sleep with a clinician.</li>
+    <li><b>Trackers are mainstream and causing anxiety.</b> 48% have used one (up from 35% in 2023), and 76% have lost sleep worrying about their sleep.</li>
+    <li><b>Apps don't hold January users.</b> Calm and Headspace keep about 8% of new January users at 30 days (Apptopia; dated, but the most-cited figure).</li>
+    <li><b>The January / HSA-FSA window is real.</b> An employee's whole FSA election (up to $3,400) is available on Jan 1, and HSAs hold $192B across 42.6M accounts. <b>Compliance:</b> eligibility through Flex usually depends on a letter of medical necessity, and the IRS warned wellness sellers in 2024 (IR-2024-65). Have counsel confirm the wording.</li>
+  </ul>
+
+  <h3 id="r-alt">What people buy instead</h3>
+  <div class="map" role="img" aria-label="Two by two map. Rows are active skill versus passive; columns are self-serve versus live human guidance. AOL sits in the active skill, live guidance quadrant at the low price end.">
+    <span class="corner"></span><span class="ax top">Self-serve</span><span class="ax top">Live human guidance</span>
+    <span class="ax side">Active skill<br>(you learn it)</span>
+    <div class="cell"><b>Crowded</b>Calm, Headspace, Rise, Breathwrk, Othership app, digital CBT-I (Sleepio, Stellar), free NSDR / yoga nidra</div>
+    <div class="cell hot"><b>Sparse</b>MBSR (8 wks, $450–650), TM (~$980), AOL Part 1 ($295), live breathwork drop-ins. Sleep Reset sits on the border with text coaching.<br><span class="aol">AOL Sleep Protocol · $149 · 3 days</span></div>
+    <span class="ax side">Passive<br>(take or wear it)</span>
+    <div class="cell"><b>Most crowded</b>Melatonin, magnesium, AGZ, Momentous, CBD/CBN, ZzzQuil, Hatch, Ozlo, Eight Sleep, Elemind, Apollo</div>
+    <div class="cell"><b>Sparse, premium</b>Prescription sleep drugs (needs a clinician), sleep retreats ($859+ per night)</div>
+  </div>
+  <ul class="ladder">
+    <li><span class="px">Free</span><span>NSDR / yoga nidra on YouTube</span></li>
+    <li><span class="px">$40–60 / yr</span><span>Sleep Cycle, BetterSleep, Breathwrk</span></li>
+    <li><span class="px">$70–80 / yr</span><span>Calm, Headspace, Rise, Oura membership</span></li>
+    <li><span class="px">~$130 / yr</span><span>Othership app</span></li>
+    <li class="me"><span class="px">$149 once</span><span>AOL Sleep &amp; Anxiety Protocol</span></li>
+    <li><span class="px">$199–279 once</span><span>Hatch Restore 3, Ozlo Sleepbuds 2</span></li>
+    <li><span class="px">$295</span><span>AOL Part 1 / SKY online (same 3-day format)</span></li>
+    <li><span class="px">$297 / 28 days</span><span>Sleep Reset (coached CBT-I, HSA/FSA)</span></li>
+    <li><span class="px">$350–400 once</span><span>Apollo Neuro, Elemind headband</span></li>
+    <li><span class="px">$450–650</span><span>MBSR, 8 weeks</span></li>
+    <li><span class="px">$830–1,320 / yr</span><span>Premium supplement stacks (AGZ, Momentous, Beam Dream)</span></li>
+    <li><span class="px">~$980</span><span>Transcendental Meditation <span class="uv">unverified</span></span></li>
+    <li><span class="px">$2,300–4,000+</span><span>Eight Sleep Pod 5, plus about $200 a year</span></li>
+  </ul>
+  <div class="tblwrap"><table>
+    <tr><th>Category</th><th>What's happening</th><th>Use for AOL</th></tr>
+    <tr><td class="k">Melatonin</td><td>A Nov 2025 AHA abstract (observational, not peer-reviewed) linked long-term use to about 90% higher odds of heart failure. A 2023 JAMA study found 88% of gummies mislabeled.</td><td>Explains why the audience has moved on. Never criticize it in ads.</td></tr>
+    <tr><td class="k">Digital CBT-I</td><td>The AASM guideline (Apr 13, 2026) calls CBT-I alone the most effective first-line treatment for chronic insomnia. SleepioRx is FDA-cleared. Sleep Reset and Stellar are HSA/FSA eligible.</td><td>The most credible competitor. Present the course as calming the nervous system, alongside other care, never as insomnia treatment.</td></tr>
+    <tr><td class="k">Apps</td><td>Calm's revenue reportedly fell in 2023, Headspace cut 13% of staff in 2025, and Calm launched a standalone sleep app in Sep 2025.</td><td>App fatigue is an objection AOL can answer with live teachers.</td></tr>
+    <tr><td class="k">Hemp / CBN</td><td>The federal hemp-THC cap reportedly takes effect around Dec 11, 2026 <span class="uv">unverified</span>.</td><td>Some gummy users will be looking for an alternative in January.</td></tr>
+  </table></div>
+  <p class="src">AOL's own Part 1 sells the same 3-day, 2.5-hour live format for $295, twice this course's price. That is a cannibalization risk, and a natural next step to offer graduates.</p>
+
+  <h3 id="r-msg">How the category talks</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Approach</th><th>Who uses it</th><th>Read</th><th>Fit for AOL</th></tr>
+    <tr><td class="k">3 AM waking</td><td>Cortisol creators; "waking up at 3 a.m." searches rising</td><td>Instantly recognized. Show it as a moment everyone knows, not a condition the viewer has.</td><td><span class="pill s">Strong</span></td></tr>
+    <tr><td class="k">Racing / busy mind</td><td>Calm, Hims &amp; Hers</td><td>How people describe the problem. Say "busy mind," never "your anxiety."</td><td><span class="pill s">Strong</span></td></tr>
+    <tr><td class="k">Ritual / self-care</td><td>Hatch, Beam Dream</td><td>Warm and identity-based. AOL's evening practice is the ritual.</td><td><span class="pill s">Strong</span></td></tr>
+    <tr><td class="k">Participant stories</td><td>Category-wide</td><td>Most relatable. Must show typical experience and carry consent.</td><td><span class="pill s">Strong</span></td></tr>
+    <tr><td class="k">Science-backed</td><td>Eight Sleep, Momentous, Rise</td><td>A stated mechanism builds trust; inflated outcome numbers lose it.</td><td><span class="pill p">Possible</span></td></tr>
+    <tr><td class="k">Drug-free</td><td>Sleep Reset</td><td>Say "a skill, not a supplement." Never criticize medication.</td><td><span class="pill p">Possible</span></td></tr>
+    <tr><td class="k">Fall asleep in X minutes</td><td>Eight Sleep ("44% faster")</td><td>Reads as a promise. Skeptics discount it.</td><td><span class="pill a">Avoid</span></td></tr>
+    <tr><td class="k">Sleep scores / biohacking</td><td>Oura, Eight Sleep, Rise</td><td>Fuels sleep anxiety. Use only as a contrast.</td><td><span class="pill a">Avoid</span></td></tr>
+    <tr><td class="k">Before / after</td><td>Eight Sleep charts</td><td>Suggests a cure, and Meta tightened this policy in 2026.</td><td><span class="pill a">Avoid</span></td></tr>
+  </table></div>
+  <div class="tblwrap"><table>
+    <tr><th>Trend into January 2027</th><th>Direction</th><th>Signal</th></tr>
+    <tr><td class="k">Meditation, breathwork, NSDR</td><td><span class="pill r">Rising</span></td><td>27% of US adults tried it, the top sleep trend</td></tr>
+    <tr><td class="k">"Nervous system regulation"</td><td><span class="pill r">Rising</span></td><td>Interest up about 1,000% year over year; a backlash against "dysregulated = broken" is growing</td></tr>
+    <tr><td class="k">Distrust of wellness influencers</td><td><span class="pill r">Rising</span></td><td>40% get health info from influencers; only about 1 in 10 trust most of it</td></tr>
+    <tr><td class="k">Anti-resolution January</td><td><span class="pill r">Rising</span></td><td>Recess "You Don't Need a New You," Solidcore "Quit the Noise." The Jan 1 launch rides the resolution wave; Quitters' Day (Jan 8) is the pivot to the anti-resolution message.</td></tr>
+    <tr><td class="k">Cortisol / 3 AM cortisol</td><td><span class="pill pk">Peaking</span></td><td>Still visible; expert pushback is mainstream</td></tr>
+    <tr><td class="k">Sleepmaxxing, mouth taping</td><td><span class="pill pk">Peaking</span></td><td>Searches fell from about 33k to 4k a month (Apr–Aug 2026) <span class="uv">secondary</span></td></tr>
+  </table></div>
+  <p class="secnote">Words the audience uses. Solid outline: safe to use in ads. Dashed: research only, because it's too close to describing the viewer's condition under Meta's rules, or names a competitor ingredient.</p>
+  <div class="chips">
+    <span class="chip">tired but wired</span><span class="chip">wide awake at 3 AM</span><span class="chip">can't turn my brain off</span><span class="chip">racing thoughts</span><span class="chip">body's tired, mind isn't</span><span class="chip">wake up exhausted</span><span class="chip">never feel rested</span><span class="chip">running on fumes</span><span class="chip">wind-down routine</span><span class="chip">doomscrolling in bed</span><span class="chip">revenge bedtime procrastination</span><span class="chip">sleep score anxiety</span>
+    <span class="chip l">dreading bedtime</span><span class="chip l">sleep anxiety</span><span class="chip l">melatonin hangover</span><span class="chip l">melatonin stopped working</span><span class="chip l">cortisol spike</span>
+  </div>
+</section>
+
+<!-- ================================================================ CURRENT STATE -->
+<section id="current" data-view>
+  <h2>Current state</h2>
+  <p class="secnote">What AOL has today: the live landing pages, the ads running now, and the analytics and marketing tools behind them. Ads and tools were observed directly on Nov 13, 2026; the page audit dates from Aug 26, 2026.</p>
+  <nav class="inner" aria-label="Current state sections"><span>Jump to</span><a href="#c-audit">Landing page audit</a><a href="#c-ads">Live ads</a><a href="#c-stack">Tech stack</a><a href="#c-read">Capability read</a></nav>
+
+  <h3 id="c-audit">Landing page audit (Aug 26, 2026)</h3>
+  <div class="stats">
+    <div class="stat"><b>48 / 100</b><span>organic page overall score</span></div>
+    <div class="stat"><b>45 / 100</b><span>paid page overall score</span></div>
+    <div class="stat"><b>2.55 : 1</b><span>primary CTA contrast (WCAG needs 4.5)</span></div>
+    <div class="stat"><b>0</b><span>forms on either page; every non-buyer was lost</span></div>
+  </div>
+  <ul class="tight">
+    <li><b>The paid hero sold a New Year's resolution in August</b> ("This year, DON'T stress like you did last year").</li>
+    <li><b>The pages contradicted each other:</b> 43 vs 42 years, 10,000+ vs 3,000+ centres, and 182 vs 180 countries within one page.</li>
+    <li><b>No H1, no landmarks, no <code>lang</code>,</b> 44 unnamed links, and 47 of 49 images without alt text.</li>
+    <li><b>A testimonial named a product that doesn't exist</b> ("Sleep &amp; Calm Reset"), told two different stories across the pages, and used a stock photo.</li>
+    <li><b>The A/B test varied six things at once</b> at an uneven 2:1 split, so it couldn't show why either variant won.</li>
+  </ul>
+  <p>The new page in <code>landing/</code> closes every finding: 1 H1, 6.09:1 CTA contrast, 292 DOM nodes (down from 1,307), and a 24% shorter scroll. As of Nov 13 the live URL still serves the old page.</p>
+
+  <h3 id="c-ads">AOL's current advertising</h3>
+  <div class="stats">
+    <div class="stat"><b>~560</b><span>active Meta ads linking to artofliving.org</span></div>
+    <div class="stat"><b>~300</b><span>Google ads, about 200 of them YouTube video</span></div>
+    <div class="stat"><b>4</b><span>verified Google advertiser accounts</span></div>
+    <div class="stat"><b>0</b><span>Meta ads running for the Sleep &amp; Anxiety Protocol right now</span></div>
+  </div>
+  <ul class="tight">
+    <li><b>Most Meta spend goes to Part 1 / SKY</b> (up to 9 copies of each creative, "from as low as $27 / month"), then Mantra Meditation, the Part 2 silent retreat, and a free 6-day breathing challenge.</li>
+    <li><b>Part 1 ads already name sleep as a benefit,</b> so in January both campaigns will bid for the same audiences.</li>
+    <li><b>The stale hook is still running:</b> "This year, don't STRESS like you did last year…" (started Oct 21, 2026).</li>
+    <li><b>Yet another set of trust stats:</b> Part 1 ads say "45 million across 180 countries."</li>
+    <li><b>What works:</b> creator partnership ads (angelica_jordan_, Annelies Richmond, andrew.keaveney), trend-led hooks ("Cortisol-reducing Habits"), and plain-spoken copy in the Mantra ads ("If 'just relax' feels like the most stressful advice you've ever heard…"), which is the closest voice to this campaign.</li>
+    <li><b>The 6-day breathing challenge already collects leads.</b> That list is a warm audience for this course.</li>
+  </ul>
+
+  <h3 id="c-stack">Analytics and martech stack</h3>
+  <p class="secnote">Read from the live pages and the public GTM container GTM-KFJ8G2M. This shows what is installed, not how well it's used.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Function</th><th>What's deployed</th><th>Assessment</th></tr>
+    <tr><td class="k">Landing pages</td><td>Unbounce (event.us), 64 third-party hosts on the sleep page</td><td>Still the old page.</td></tr>
+    <tr><td class="k">Registration / CRM</td><td><b>Salesforce</b> (course IDs like <code>a04Vu00000…</code>; <code>aolf.force.com</code>), Next.js front end on members.us, Heroku API, <b>Stripe</b>, <b>Flex</b> for HSA/FSA</td><td>Modern and capable. Checkout asks for email before payment.</td></tr>
+    <tr><td class="k">Tag management</td><td>One GTM container on <b>both</b> domains, Consent Mode configured</td><td>Large: 141 GA4 event tags, 59 custom-HTML tags, 47 paused.</td></tr>
+    <tr><td class="k">Web analytics</td><td>3 GA4 properties (G-53SWQFSBV0, G-84L9339ZP8, G-L8HTBLL6YR), 2 retired UA IDs, Segment, an in-house endpoint</td><td>Data is split across properties.</td></tr>
+    <tr><td class="k">Conversion events</td><td><code>sleep_course_purchase</code> (value, currency, transaction ID), <code>purchase</code>, <code>begin_checkout</code>, <code>add_to_cart</code>, <code>allcourses_enroll_click</code>, Segment "Product List Viewed"</td><td>Purchase tracking for this course already exists.</td></tr>
+    <tr><td class="k">Meta</td><td>5 pixel IDs (4 in GTM, 1 hard-coded), a GA4→Meta event map with dedup parameters, a Conversions API gateway, CustomerLabs CDP</td><td>Server-side tracking looks partly built. Five pixels fire on every page.</td></tr>
+    <tr><td class="k">Google Ads</td><td>Conversion tags for 6 account IDs, remarketing, conversion linker</td><td>Used heavily, but split across accounts.</td></tr>
+    <tr><td class="k">Other ad pixels</td><td>TikTok, Snapchat, Pinterest, Nextdoor, LinkedIn, Quora, 6sense</td><td>Many networks; little sign of active campaigns on most.</td></tr>
+    <tr><td class="k">Email / automation</td><td>HubSpot (portal 4157581: forms, collected-forms capture, ads pixel, chat); SMS policy in checkout</td><td>Ready for checkout follow-up.</td></tr>
+    <tr><td class="k">Behavior analytics</td><td>Microsoft Clarity, Crazy Egg, Mouseflow</td><td>Three tools doing one job.</td></tr>
+    <tr><td class="k">On-page tools</td><td>IntelliTicks chat, Convertful popups, Spiffy</td><td>Conflict with a single-goal page.</td></tr>
+  </table></div>
+
+  <h3 id="c-read">Capability read</h3>
+  <div class="risk"><span class="sev ok">Strength</span><p><b>The plumbing for end-to-end attribution exists.</b>Shared GTM, a purchase event for this course, Salesforce as the system of record, HubSpot for follow-up, and early server-side Meta work. The job is consolidation, not new tools.</p></div>
+  <div class="risk"><span class="sev warn">Gap</span><p><b>No single source of truth.</b>Three GA4 properties, six Google Ads conversion IDs and five Meta pixels mean every platform reports a different number.</p></div>
+  <div class="risk"><span class="sev warn">Gap</span><p><b>Campaign tags are lost before checkout.</b>The landing page's Register links carry no campaign parameters, and the checkout URL has only <code>source=allcourses</code>.</p></div>
+  <div class="risk"><span class="sev warn">Gap</span><p><b>Container debt.</b>47 paused tags, retired UA references, and two unrecognized ad domains (<code>deliciescondard.com</code>, <code>r.tapnative.com</code>) in custom-HTML tags. The GTM owner should review them.</p></div>
+  <div class="risk"><span class="sev crit">Check</span><p><b>Two compliance items.</b>The program-agreement and health-statement boxes appeared already ticked when checkout loaded. The course page says "over 3 hours per day" and "biohacks," but every cohort runs 2.5 hours.</p></div>
+  <p class="src">Course supply is healthy: 23 Pacific-time online cohorts were listed through mid-December, mostly 5–7 PM PT starts, plus some weekday mornings and weekends.</p>
+</section>
+
+<!-- ================================================================ PERSONAS -->
+<section id="personas" data-view>
+  <h2>Personas</h2>
+  <p class="secnote">Five composite people built from the research data. They are not real customers. Four are the paid audience; the fifth is the warm list. Each one tells the copywriter what to say, the designer what to show, and the media buyer where to find them. The figures under each persona come from the sources in <a href="#research">Research</a>.</p>
+
+  <div class="tblwrap"><table>
+    <tr><th>Persona</th><th>Audience</th><th>Main channel</th><th>Hook</th><th>Biggest objection</th></tr>
+    <tr><td class="k">Denise, 52</td><td>3 AM Waker</td><td>Facebook feed</td><td>"3 AM has a lot to say."</td><td>"I've tried everything."</td></tr>
+    <tr><td class="k">Marcus, 46</td><td>3 AM Waker</td><td>YouTube</td><td>"Better mornings, sharper days."</td><td>"Is this spiritual stuff?"</td></tr>
+    <tr><td class="k">Priya, 34</td><td>Wired &amp; Tired</td><td>Instagram Reels, creators</td><td>"Your body clocked out. Your mind didn't."</td><td>"Another program I'll quit."</td></tr>
+    <tr><td class="k">Jess, 39</td><td>Wired &amp; Tired</td><td>Facebook + Instagram</td><td>"After the kids are down, the thoughts start."</td><td>Price and evening time</td></tr>
+    <tr><td class="k">Linda, 61</td><td>Warm list</td><td>AOL email, organic</td><td>"Come back to your breath."</td><td>"I already know this."</td></tr>
+  </table></div>
+
+  <div class="personas">
+
+    <article class="persona s">
+      <header><span class="mono" aria-hidden="true">D</span><h3>Denise, 52</h3><span class="who">Finance director for a school district · Sacramento, CA · married, one teen at home</span><span class="door"><span class="pill r">3 AM Waker · primary</span></span></header>
+      <p class="quote">"I fall asleep fine. Then it's 3:07 and I'm planning tomorrow's budget meeting."</p>
+      <div class="pgrid">
+        <dl>
+          <dt>Her night</dt><dd>Asleep by 10:30. Awake between 3 and 3:30 with a running to-do list. Back to sleep around 4:30, if at all. The alarm at 6:15 feels like an insult.</dd>
+          <dt>What she's tried</dt><dd>Melatonin (groggy, then stopped working). Magnesium glycinate (still takes it, about $25 a month). White noise. Calm's sleep stories (subscription lapsed). No caffeine after noon.</dd>
+          <dt>Money</dt><dd>Elects $1,500 in her FSA every year and often scrambles to use it by December. $149 is easy if it's FSA-eligible.</dd>
+          <dt>Where she is</dt><dd>Facebook daily (local groups, news), Instagram some, YouTube for how-tos. Reads email at her desk; scrolls on her phone in bed.</dd>
+        </dl>
+        <dl>
+          <dt>What gets her to buy</dt><dd>A bad week before a deadline, plus January's fresh FSA balance. A friend mentioning "a breathing thing that actually helped."</dd>
+          <dt>Objections</dt><dd>"I've tried everything." "Do I have to sit cross-legged for hours?" Evening sessions clash with dinner, so she needs to see the weekday-morning and weekend cohorts.</dd>
+          <dt>What lands</dt><dd>A skill she can use <em>at</em> 3 AM, lying in bed. A live teacher she can ask questions. "HSA/FSA eligible." Morning-light imagery.</dd>
+          <dt>Never say to her</dt><dd>Anything about menopause, "your insomnia," sleep scores, or cures.</dd>
+        </dl>
+        <div class="full"><dt>Campaign fit</dt><dd>Ads <code>vid15-307am-s</code>, <code>static-pair-1s…3s</code>, <code>carousel-3days</code> · mainly Facebook feed, ages 45–55.</dd></div>
+      </div>
+      <footer>Built on: trouble staying asleep is 22.3% at ages 50–64 (CDC 2026); women report more middle-of-the-night waking (21.4% vs 14.6%); full FSA elections are available Jan 1.</footer>
+    </article>
+
+    <article class="persona s">
+      <header><span class="mono" aria-hidden="true">M</span><h3>Marcus, 46</h3><span class="who">Regional sales director · Chicago, IL · married, two kids (11, 14)</span><span class="door"><span class="pill p">3 AM Waker · secondary</span></span></header>
+      <p class="quote">"My Whoop says 61% recovery. I didn't need a wristband to tell me that."</p>
+      <div class="pgrid">
+        <dl>
+          <dt>His night</dt><dd>Out cold at 11. Awake at 4 AM thinking about quarterly numbers. Gives up, checks email, runs on coffee.</dd>
+          <dt>What he's tried</dt><dd>Whoop (the score adds pressure). Considered an Eight Sleep. Melatonin now and then. Cutting back on the evening drink. NSDR from Huberman on YouTube, when he remembers.</dd>
+          <dt>Money</dt><dd>Spends on gear without much thought: he's in the 20% of men who spend $200–500 a year on sleep. $149 isn't an issue; time is.</dd>
+          <dt>Where he is</dt><dd>YouTube (long podcasts, sports), LinkedIn, Instagram lightly.</dd>
+        </dl>
+        <dl>
+          <dt>What gets him to buy</dt><dd>A performance reason: Q1 kickoff, an important quarter. Respects structure: "3 days, a protocol, a teacher."</dd>
+          <dt>Objections</dt><dd>"Is this spiritual?" "I'll just push through." Suspicious of anything that sounds like a retreat.</dd>
+          <dt>What lands</dt><dd>Plain mechanism ("longer exhales slow your breathing"). "No scores. No subscription." Better mornings framed as a better workday.</dd>
+          <dt>Never say to him</dt><dd>Guru language, heavy Sanskrit, or biohacking promises such as "boost deep sleep 34%."</dd>
+        </dl>
+        <div class="full"><dt>Campaign fit</dt><dd>YouTube in-stream with <code>vid15-307am-s</code> and <code>vid15-mechanism-w</code> · the reason the brief's optional YouTube line is worth testing. Google's health rules limit remarketing, so this is prospecting only.</dd></div>
+      </div>
+      <footer>Built on: 20% of men vs 12% of women spend $200–500 a year on sleep products, and 48% have used a sleep tracker (AASM 2025); 65% have lost sleep over work thoughts.</footer>
+    </article>
+
+    <article class="persona w">
+      <header><span class="mono" aria-hidden="true">P</span><h3>Priya, 34</h3><span class="who">Senior product manager, hybrid · Austin, TX · lives with partner, no kids</span><span class="door"><span class="pill r">Wired &amp; Tired · primary</span></span></header>
+      <p class="quote">"My body is exhausted. My brain is still in a Slack thread."</p>
+      <div class="pgrid">
+        <dl>
+          <dt>Her night</dt><dd>In bed at 11:30, scrolling until 12:45 because it's the only time that's hers. Lies there replaying the day. Takes 45 minutes or more to fall asleep.</dd>
+          <dt>What she's tried</dt><dd>Headspace (a 90-day streak, then quit). Oura (score anxiety). Ashwagandha. The sleepy girl mocktail. Sees a therapist for anxiety; this course would sit alongside that, not replace it.</dd>
+          <dt>Money</dt><dd>Oura membership, supplements about $40 a month, and she happily pays for experiences and classes. Has an HSA through a high-deductible plan.</dd>
+          <dt>Where she is</dt><dd>Instagram Reels and TikTok, Huberman and other podcasts, Reddit. Follows breathwork and nervous-system creators but distrusts the hype.</dd>
+        </dl>
+        <dl>
+          <dt>What gets her to buy</dt><dd>January performance reviews. A creator she trusts sharing a real experience. A live format that makes her show up.</dd>
+          <dt>Objections</dt><dd>"Is this woo?" "Where's the evidence?" "Another program I'll start and abandon." 7.5 live hours.</dd>
+          <dt>What lands</dt><dd>"No streaks. No scores." Live Q&amp;A ("an app can't answer back"). Honest evidence with its limits stated. The anti-resolution tone: "the one resolution that asks you to do less."</dd>
+          <dt>Never say to her</dt><dd>"Biohacks" (the course page uses it, and she rolls her eyes), cortisol claims, "fix your nervous system."</dd>
+        </dl>
+        <div class="full"><dt>Campaign fit</dt><dd>Ads <code>vid15-offswitch-w</code>, <code>static-pair-1w…3w</code>, plus creator partnership ads (AOL already runs these) · Instagram Reels and Stories, ages 28–40.</dd></div>
+      </div>
+      <footer>Built on: 27% of adults tried meditation or breathwork for sleep (AASM, Dec 2025); 76% have lost sleep worrying about their sleep; meditation apps keep about 8% of January users at 30 days; only about 1 in 10 trust most health influencers (Pew 2026).</footer>
+    </article>
+
+    <article class="persona w">
+      <header><span class="mono" aria-hidden="true">J</span><h3>Jess, 39</h3><span class="who">Elementary school teacher · Columbus, OH · two kids (6, 9) · household income about $95k</span><span class="door"><span class="pill r">Wired &amp; Tired · primary</span></span></header>
+      <p class="quote">"The minute the house goes quiet, my brain gets loud."</p>
+      <div class="pgrid">
+        <dl>
+          <dt>Her night</dt><dd>Kids down at 8:30, then lunches, laundry, bills. Dozes on the couch at 10, then lies awake in bed doing the family's math.</dd>
+          <dt>What she's tried</dt><dd>Free apps, YouTube yoga nidra, the occasional antihistamine "just to get some sleep." Doesn't buy much for herself.</dd>
+          <dt>Money</dt><dd>In the 51% who spend $100 or less a year on sleep. $149 needs to be justified; payment plans and the FSA through her district plan both matter.</dd>
+          <dt>Where she is</dt><dd>Facebook (parent and teacher groups), Instagram, Pinterest, email.</dd>
+        </dl>
+        <dl>
+          <dt>What gets her to buy</dt><dd>Seeing a cohort that starts after bedtime, from home. Permission rather than pressure: something practical she can do in bed.</dd>
+          <dt>Objections</dt><dd>Price. Evening time ("7 PM PT is 10 PM for me"). Feeling that spending on herself is selfish.</dd>
+          <dt>What lands</dt><dd>"From home, after the kids are down." Payment plans and HSA/FSA, shown plainly. Warmth and generosity. Practical tools she can use immediately.</dd>
+          <dt>Never say to her</dt><dd>Guilt ("you owe it to your family"), countdowns, "limited time," or anything that sounds like another obligation.</dd>
+        </dl>
+        <div class="full"><dt>Campaign fit</dt><dd>Ads <code>static-pair-2w</code>, <code>carousel-3days</code>, quote cards in retargeting · course list filtered to her time zone · Facebook and Instagram feed, ages 32–45. She is the persona most likely to start checkout and stop, so she is the audience for the checkout follow-up emails.</dd></div>
+      </div>
+      <footer>Built on: frequent stress among women under 50 is up 23 points since 2007 (Gallup); 78% have lost sleep over money worries, and household duties are the #1 thing adults put ahead of sleep (42%, AASM 2025).</footer>
+    </article>
+
+    <article class="persona warm">
+      <header><span class="mono" aria-hidden="true">L</span><h3>Linda, 61</h3><span class="who">Recently retired nurse manager · Raleigh, NC · took AOL Part 1 in 2017</span><span class="door"><span class="pill pk">Warm list · organic</span></span></header>
+      <p class="quote">"I used to do my breathing every morning. Somewhere along the way I stopped, and my sleep went with it."</p>
+      <div class="pgrid">
+        <dl>
+          <dt>Her situation</dt><dd>On the AOL email list and signed up for the 6-day breathing challenge. Her practice lapsed and her sleep has drifted since retirement.</dd>
+          <dt>Where she is</dt><dd>AOL emails, the AOL Instagram and Facebook pages, local center events.</dd>
+        </dl>
+        <dl>
+          <dt>What lands</dt><dd>"Come back to your breath." Familiar teachers. A sleep-specific reason to return. She is likely to upgrade to Part 2 later.</dd>
+          <dt>Objection</dt><dd>"I already know this." Answer: this course is sleep-specific, and it is not SKY.</dd>
+        </dl>
+        <div class="full"><dt>Campaign fit</dt><dd>List blasts and challenge-list emails, plus organic posts. <b>Exclude from paid ads,</b> since she is a large part of the brief's roughly 15 organic registrations and paying to reach her wastes budget.</dd></div>
+      </div>
+      <footer>Built on: middle-of-the-night waking rises steeply after 50 (CDC); AOL's existing list and the 6-day challenge leads are the warmest audience available.</footer>
+    </article>
+  </div>
+
+  <h3>Who this is not for</h3>
+  <ul class="tight">
+    <li><b>People seeking treatment for a diagnosed sleep disorder</b> (sleep apnea, severe chronic insomnia). The course complements care; it doesn't replace it. Ads must never target them or imply diagnosis.</li>
+    <li><b>Gen Z "bed rotting" and sleepmaxxing audiences.</b> Outside the 28–55 range, and the trend is fading.</li>
+    <li><b>Sleep-score optimizers looking for numbers.</b> The course promises a practice, not a metric.</li>
+  </ul>
+</section>
+
+<!-- ================================================================ STRATEGY -->
+<section id="strategy" data-view>
+  <h2>Creative strategy <span class="pill done" style="vertical-align:4px">v2</span></h2>
+  <p class="secnote">One idea driving the ads, the landing page and the emails. Version 2 adds the research findings, the personas, and your decision that the landing page has one goal: registration.</p>
+  <nav class="inner" aria-label="Strategy sections"><span>Jump to</span><a href="#s-spine">Spine</a><a href="#s-doors">Audiences</a><a href="#s-angles">Message angles</a><a href="#s-ads">Ads</a><a href="#s-lp">Landing page</a><a href="#s-email">Emails</a><a href="#s-rails">Claims rules</a><a href="#s-build">Build order</a></nav>
+
+  <h3 id="s-spine">The strategic spine</h3>
+  <div class="thesis">
+    <p>3 AM isn't about the hours you lose. It's about the day you can't face afterwards. So we don't sell sleep. We sell the morning you get back.</p>
+    <small>Night appears only as a brief, abstract moment (a clock face, phone glow, open eyes) and never as a person suffering in bed. Morning gets most of the frame time in every asset. This keeps the brief's "3 AM vs 7 AM" concept within the brand guide's ban on dark bedroom imagery.</small>
+  </div>
+  <p><b>Proposition</b> (used verbatim): <em>Retrain your nervous system for sleep in 3 days, with your breath, not a pill.</em><br><b>Tagline (new, Nov 18):</b> <em>Rest is a skill. Learn it in 3 days.</em> It closes every ad, and can serve as the landing page hero kicker and the email sign-off. <b>Season kicker:</b> Resolve to Rest (Jan 1–7). <b>One CTA everywhere:</b> "Get your sleep back — register now."</p>
+  <div class="pillars">
+    <div class="pillar"><b>The only one of its kind</b><span>The only live, sleep-specific course at near-app pricing. True, hard to copy, and it answers the price objection.</span></div>
+    <div class="pillar"><b>A skill you keep</b><span>Not a refill, a ring or a subscription. You learn it once and use it every night.</span></div>
+    <div class="pillar"><b>Live and human</b><span>Certified teacher, small group, daily Q&amp;A. The answer to app fatigue.</span></div>
+    <div class="pillar"><b>Honest evidence</b><span>Independent studies on the practices, plus our own participant survey labelled as ours, each with its limits stated.</span></div>
+  </div>
+
+  <h3 id="s-doors">Two audiences, one course</h3>
+  <p>The sleep audience and the anxiety audience buy the same course. Only the way in differs. The core buyer across both is women 30–55.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Audience</th><th>Personas</th><th>Code</th><th>Hook family</th></tr>
+    <tr><td class="k">3 AM Waker</td><td>Denise (primary), Marcus</td><td><code>sap-ny27-s</code></td><td>"3 AM has a lot to say. 7 AM can feel different." · "Same night. Gentler morning."</td></tr>
+    <tr><td class="k">Wired &amp; Tired</td><td>Priya, Jess (both primary)</td><td><code>sap-ny27-w</code></td><td>"Your body clocked out. Your mind didn't." · "For the mind that's still busy at bedtime."</td></tr>
+  </table></div>
+  <ul class="tight">
+    <li><b>Separate Meta campaigns per audience,</b> starting at <b>50/50</b> budget. (v1 proposed 60/40 toward sleep; the research shows the busy mind is as strong a way in, so let the first two weeks decide.) Rebalance weekly on cost per registration.</li>
+    <li>The audience code avoids the word "anxiety" on purpose. Keep condition words out of URLs, UTMs and event names (see <a href="#m-fixes">Measurement</a>).</li>
+    <li>Linda (warm list) is reached by email and organic posts only, and excluded from paid ads.</li>
+  </ul>
+
+  <h3 id="s-angles">Five message angles</h3>
+  <div class="angles">
+    <div class="angle"><b>1 · Same night, different morning</b><q>3 AM has a lot to say. 7 AM can feel different.</q><span class="src">The core concept, and now backed by our own data: waking refreshed was the biggest change participants reported. 3 AM appears as type or a clock on soft daylight colors.</span></div>
+    <div class="angle"><b>2 · The resolution that asks you to do less</b><q>This year, start with rest. No streaks. No scores. Just rest.</q><span class="src">Phase 2 copy, from Quitters' Day (Jan 8). Phase 1 (Jan 1–7) leads with "Start the year with rest." Lands with Priya and Jess.</span></div>
+    <div class="angle"><b>3 · A skill you keep, not something you take</b><q>Learn it once. Use it every night, even at 3 AM.</q><span class="src">Answers melatonin and supplement fatigue without naming them. Lands with Denise and Marcus.</span></div>
+    <div class="angle"><b>4 · Live and human</b><q>Three live sessions. Real teachers. Real questions answered.</q><span class="src">Answers app fatigue. Verify any heritage claim before using it.</span></div>
+    <div class="angle"><b>5 · Quiet the busy mind</b><q>Slower breath. Quieter thoughts. Softer mornings.</q><span class="src">A calm alternative to cortisol and nervous-system hype. Back it with modest proof and participant stories.</span></div>
+  </div>
+
+  <h3 id="s-ads">Ad creative system</h3>
+  <p class="secnote">The brief's asset list, assigned to audiences. Each asset name is its <code>utm_content</code> value, so performance reports back by name. v2 removes the hooks that named melatonin or other products.</p>
+  <p class="secnote"><b>Designed Nov 18 in <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=0-1" target="_blank" rel="noopener">Figma</a>:</b> the tagline board, then 6 static concepts in 4 sizes each (1:1, 4:5, 9:16 with Meta's safe zones, 1.91:1). Each concept has a notes card with its audience, angle, draft primary text and swap-ins. Every frame ends on one shared component: the tagline, "Art of Living · 3 live sessions · $149" and the members-site button. The look is type-led on the members-site palette (lavender, cream, Lora, the dark button), so the ad, the landing page and checkout feel like one product. Swap the "Art of Living" type for the official logo before export.</p>
+  <p class="secnote"><b>Photo versions (Nov 18):</b> concepts 1–5 also exist with photography, as <code>…-photo</code> ads (20 more frames), so type-only and photo versions can run side by side and cost per registration decides. Night stays type-only, per the brand rule. People appear only in the morning half. Two photos are the landing page's own, for message match. The stat cards stay type-only so a stock face never sits next to "past participants". <b>Licensing:</b> the photos are Unsplash comps. The Unsplash License has no model releases and bars implied endorsement, so before paid ads run, license released equivalents (Adobe Stock, Getty) or use AOL's own participant photos with signed releases.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Asset · utm_content</th><th>Audience</th><th>Concept</th></tr>
+    <tr><td colspan="3" class="src"><b>Video: 2–3 at most.</b> Choose from the four below with Turnkey; vid15-firstnight-s also needs a consented participant quote. The number of statics is set at the Turnkey meeting.</td></tr>
+    <tr><td class="k">vid15-307am-s</td><td>3 AM Waker</td><td>A clock reads 3:07, phone glow on a ceiling, open eyes (2–3 seconds total), then a hard cut to 7:02 sunrise, a stretch, coffee. Text: "3 AM has a lot to say. 7 AM can feel different." → proposition → $149 · HSA/FSA* → CTA.</td></tr>
+    <tr><td class="k">vid15-firstnight-s</td><td>3 AM Waker</td><td>Led by a consent-verified participant quote about the first night, typed over morning footage. Ends on the 3-day structure.</td></tr>
+    <tr><td class="k">vid15-offswitch-w</td><td>Wired &amp; Tired</td><td>Thought fragments crowd the screen ("the email · the mortgage · that thing I said"). A slow breath circle clears them one exhale at a time, then morning. "An off switch you already own."</td></tr>
+    <tr><td class="k">vid15-mechanism-w</td><td>Wired &amp; Tired, YouTube</td><td>Plain explainer: longer exhales slow your breathing and tell your body the day is over, taught live over 3 days. No clinical claims. Built for Priya and Marcus.</td></tr>
+    <tr><td class="k">static-pair-1s/2s/3s</td><td>3 AM Waker</td><td>Split screens: 3:07 AM clock / 7:02 AM window light · night phone glow / morning planner · "3 AM: the to-do list" / "7 AM: ready for it."</td></tr>
+    <tr><td class="k">static-pair-1w/2w/3w</td><td>Wired &amp; Tired</td><td>Split screens: 47 browser tabs / one breath circle · a cloud of racing thoughts / a clear morning table · "Mind: still at work" / "Mind: off duty."</td></tr>
+    <tr><td class="k">statcard-1…2</td><td>Retargeting</td><td><b>New, Nov 18.</b> Survey numbers as type on brand surfaces: "Rated 8.85/10 by past participants" and "More than half woke up more refreshed." No consent needed, so retargeting doesn't depend on quote cards. Survey cleared for use Nov 18.</td></tr>
+    <tr><td class="k">static-skill</td><td>Both (3 AM Waker first)</td><td><b>New, Nov 18.</b> "Learn it once. Use it every night." Kicker: "A skill, not a supplement." Angle 3. Never names melatonin or criticizes medication.</td></tr>
+    <tr><td class="k">static-newyear</td><td>Both · Jan 1–7</td><td><b>New, Nov 18.</b> "This year, start with rest." under the Resolve to Rest kicker, with the proposition as the subline and a rising sun. Paused on Jan 8.</td></tr>
+    <tr><td class="k">static-quitters</td><td>Both · from Jan 8 (Wired &amp; Tired first)</td><td><b>New, Nov 18.</b> "No streaks. No scores. Just rest." The Quitters' Day pivot to the anti-resolution message.</td></tr>
+    <tr><td class="k">quotecard-1…4</td><td>Retargeting</td><td>Text-only participant quotes. <span class="uv">Gated:</span> each needs the consent schema. The old "Daniel K" quote can't run.</td></tr>
+    <tr><td class="k">carousel-3days</td><td>Both</td><td>"3 days, 3 shifts." <span class="uv">Confirm the day-by-day content against the actual curriculum.</span></td></tr>
+    <tr><td class="k">creator-*</td><td>Wired &amp; Tired</td><td><b>New in v2.</b> 1–2 creator partnership ads, a format AOL already runs. A creator describes their own experience; never a claim about the viewer.</td></tr>
+  </table></div>
+
+  <h3 id="s-lp">Landing page: one goal</h3>
+  <div class="callout"><p><b>The page has one job: get a visitor to register.</b> The email capture moves off the page and into checkout, which already asks for an email before payment. People who start checkout and stop get the follow-up emails instead.</p></div>
+  <p><b>Built in <code>landing/</code> (Nov 13, 2026):</b></p>
+  <ul class="tight">
+    <li><span class="pill done">Done</span> Removed the "3 AM Guide" section, its form and the sticky-bar guide link. The page has no form and no secondary path.</li>
+    <li><span class="pill done">Done</span> One CTA label: "Get your sleep back — register now" on all 6 page buttons, and "Register now" in the header and sticky bar. All of them now go to the course page; before, every button pointed at the members site's homepage.</li>
+    <li><span class="pill done">Done</span> New section, "Three fair questions": why not an app, when would I fit it in, how do I pay. It sits where the guide was.</li>
+    <li><span class="pill done">Done</span> Corrected the course facts from the live schedule: 3 sessions of 2.5 hours on consecutive days, with morning, evening and weekend groups. The old copy said "four evenings, about 90 minutes."</li>
+    <li><span class="pill done">Done</span> Every Register link carries the visitor's UTMs, click IDs, <code>aol_variant</code> and a time-zone filter. <b>Finding:</b> the members site's <code>timeZone</code> parameter <em>filters</em> to cohorts hosted in that zone; it doesn't convert times. On Nov 13, Eastern listed 29 cohorts, Central 24, Pacific 23 and Mountain 1, so Mountain visitors get no filter.</li>
+    <li><span class="pill done">Done</span> Evidence section filled with three peer-reviewed papers, one per practice, each checked against its PubMed abstract: breathwork and stress/anxiety (<i>Scientific Reports</i> 2023, meta-analysis of 12 RCTs, 785 adults); mindfulness meditation and sleep quality (<i>JAMA Internal Medicine</i> 2015, RCT, 49 adults 55+); yoga and sleep quality in women (<i>BMC Psychiatry</i> 2020, meta-analysis, 19 studies, 1,832 women). Each card keeps the authors' own caveat. The fence now says no study has examined the protocol itself, which PubMed confirms.</li>
+    <li><span class="pill done">Done</span> Restyled to match the members site, so landing page, course list and checkout feel like one product. It now uses the same dark rounded buttons, lavender page wash, hero band, glass cards, Lora 400 headlines, text greys and purple, all copied from the members site's own <code>--org-ds-*</code> tokens. The coral-pink evidence background is gone, and the questions section is white. All text passes WCAG AA at desktop and phone widths, checked over the gradients.</li>
+    <li><span class="pill done">Done</span> <b>Participant survey added (Nov 18).</b> The hero line now uses survey data. The old "better sleep after the very first session" line wasn't supported: the survey measured before vs after the whole course. A labelled "What our own participants report" panel sits under the independent studies (more than half slept better, 66% lower STAI anxiety, 8.85/10), and the enrol card shows the recommendation score. Cleared for public use by the program coordinator on Nov 18.</li>
+    <li><span class="pill todo">Next</span> Build hero B for the A/B test, fill in the Jan–Mar cohort dates, and clear the 17 <code>[CONFIRM]</code> items (recordings, refunds, HSA/FSA wording, contraindications and others).</li>
+    <li><span class="pill todo">Next</span> In Unbounce: switch off chat and popups on this page, and consider a neutral path such as <code>/resolve-to-rest</code>.</li>
+  </ul>
+  <p><b>One page, A/B test on the hero.</b> Every audience lands on the same page; Unbounce splits visitors 50/50 between hero A ("Stop Waking Up at 3 AM") and a hero B that changes one thing. It's judged on the hero button's click-through, since registrations are too few to call. Details in <a href="#p-lp">Plan → Landing page test</a>.</p>
+
+  <h3 id="s-email">Email journeys</h3>
+  <p class="secnote">v2 replaces the lead-magnet nurture with a checkout follow-up journey. Every link is tagged per the <a href="#m-utm">UTM convention</a>.</p>
+  <div class="tblwrap"><table>
+    <tr><th>Journey · utm_content</th><th>When</th><th>Job and content</th></tr>
+    <tr><td class="k" colspan="3">A · Warm lists (AOL list + 6-day challenge list): Linda</td></tr>
+    <tr><td class="k">blast1</td><td>Mon Jan 4</td><td>"This year, start with rest." Written broad, since we don't know who is on the lists: the course, $149 + HSA/FSA*, a forward-to-a-friend P.S. One CTA to the landing page. <a href="https://www.figma.com/design/U9X6Gs97nbqiS0VXccrGLJ/Sleep---Anxiety-Protocol?node-id=67-461" target="_blank" rel="noopener">Designs</a>.</td></tr>
+    <tr><td class="k">quitters <span class="uv">optional</span></td><td>Mon Jan 11</td><td>"The resolution that asks you to do less." Matches the phase 2 ads after Quitters' Day.</td></tr>
+    <tr><td class="k">results <span class="uv">optional</span></td><td>Mon Jan 25</td><td>"What three days actually changed": more than half slept better, 8.85/10, with the survey's limits stated, plus what a session is like.</td></tr>
+    <tr><td class="k">blast2</td><td>~Mon Feb 8</td><td>The next real cohort dates. Sent only if those dates are actually scheduled.</td></tr>
+    <tr><td class="k" colspan="3">B · Started checkout, didn't finish (triggered by the email entered at checkout): Jess most of all</td></tr>
+    <tr><td class="k">ac1-seat</td><td>1 hour after</td><td>"Your seat is still here." Links back to the exact course they picked, restates what's included, and invites questions by reply. This is your original Email #1, moved here.</td></tr>
+    <tr><td class="k">ac2-dates</td><td>Day 1</td><td>Answers the three objections (price, evidence, time), then cohorts in their time zone. This is your original "courses happening this month" email.</td></tr>
+    <tr><td class="k">ac3-offer</td><td>Day 3, or 72 hours before their chosen cohort</td><td>The value case, payment plans, HSA/FSA*, and the real start date as the reason to decide. Any discount must be real and time-limited, and the $449 anchor appears only if that decision is settled. This is your original Email #3.</td></tr>
+    <tr><td class="k" colspan="3">C · After registering</td></tr>
+    <tr><td class="k">pp1-prep</td><td>On purchase</td><td>Confirmation, what to expect, the Zoom details timeline. Includes the Sattva app for Yoga Nidra through store-attributed links (<code>pp1-app</code>).</td></tr>
+    <tr><td class="k">pp2-next</td><td>7 days after the course</td><td>"Keep the practice going." The path into Part 1 ($295), timed so it doesn't compete with this campaign.</td></tr>
+  </table></div>
+
+  <h3 id="s-rails">Claims and platform rules</h3>
+  <ul class="tight">
+    <li><b>Meta's personal-attributes rule.</b> Never write "your anxiety," "struggling with insomnia?" or "can't sleep?" Use shared or third-person terms: "3 AM thoughts are loud."</li>
+    <li><b>No promises</b> to cure insomnia or anxiety, nothing that suggests replacing medical care, and no "fall asleep in X minutes." Wherever research is cited, include the line: <em>these studies examine the technique, not this course.</em> Never cite the SKY research, since this course doesn't teach SKY.</li>
+    <li><b>No guilt, fear, manufactured urgency, countdowns without a real date, or exit popups.</b></li>
+    <li><b>Don't name competitors' products or ingredients</b> (melatonin, magnesium, apps).</li>
+    <li><b>HSA/FSA</b> always carries its asterisk, with wording confirmed by counsel (IRS IR-2024-65).</li>
+    <li><b>Testimonials</b> run only with the consent schema. A stock photo never stands in for a real named person.</li>
+    <li><b>Google/YouTube:</b> health-related creative loses remarketing, Customer Match and lookalike audiences. Plan YouTube as prospecting only.</li>
+  </ul>
+
+  <h3>Working with what AOL already has</h3>
+  <ul class="tight">
+    <li><b>Part 1 campaigns:</b> exclude this course's buyers and recent Part 1 buyers from each other's ads, and agree on frequency caps for overlapping audiences in January.</li>
+    <li><b>The 6-day breathing challenge list</b> is the warmest audience; route it to journey A.</li>
+    <li><b>Voice reference:</b> the Mantra Meditation ads ("If 'just relax' feels like the most stressful advice…").</li>
+    <li><b>Retire</b> "This year, don't STRESS like you did last year…" before January, so two contradicting New Year messages don't run at once.</li>
+  </ul>
+
+  <h3 id="s-build">Build order</h3>
+  <p>Moved to <a href="#plan">Plan</a>, re-based for a Jan 1 launch: Approval 1 Nov 24, production Nov 30 – Dec 11, Approval 2 Dec 14, ads submitted Dec 17, live Jan 1. Copy runs in two phases: "Start the year with rest" (Jan 1–7), then "The resolution that asks you to do less" from Quitters' Day, Jan 8.</p>
+</section>
+
+<!-- ================================================================ MEASUREMENT -->
+<section id="measurement" data-view>
+  <h2>Measurement plan <span class="pill done" style="vertical-align:4px">v2</span></h2>
+  <p class="secnote">How every registration is traced back to an ad, an audience, a page variant and an email. Version 2 reflects what's already in place: shared GTM, a purchase event, and email collected at checkout. It also reflects the single-goal page.</p>
+  <nav class="inner" aria-label="Measurement sections"><span>Jump to</span><a href="#m-spine">Identity spine</a><a href="#m-funnel">Funnel</a><a href="#m-fixes">Pre-launch fixes</a><a href="#m-utm">UTMs</a><a href="#m-events">Events</a><a href="#m-attr">Attribution</a><a href="#m-qa">QA gate</a></nav>
+
+  <h3 id="m-spine">The identity spine</h3>
+  <p class="secnote">Four keys carry a visitor's identity from ad to order. If all four survive, any registration traces back to its source.</p>
+  <div class="spine">
+    <div class="key"><b>UTMs + click ID</b><small>Ad → landing page → checkout</small><p>Five UTM parameters on every link, plus <code>fbclid</code> or <code>gclid</code>. <b>New:</b> the landing page passes them, with <code>aol_variant</code>, on to every Register link, so they reach the checkout.</p></div>
+    <div class="key"><b>GA4 client ID</b><small>Across both domains</small><p>GTM-KFJ8G2M already runs on event.us and members.us, and the <code>_gl</code> linker is already in use. One session, start to finish, once a single GA4 property is chosen.</p></div>
+    <div class="key"><b>Checkout email</b><small>Checkout → Salesforce → HubSpot</small><p>Checkout asks for an email before payment. That email starts the follow-up emails and joins every touch on one HubSpot contact.</p></div>
+    <div class="key"><b>Transaction ID</b><small>Order → reporting</small><p><code>sleep_course_purchase</code> already sends value, currency and <code>transaction_id</code>. The Salesforce order is the final record.</p></div>
+  </div>
+
+  <h3 id="m-funnel">The funnel, instrumented</h3>
+  <p class="secnote"><span class="pill build">build</span> marks work that doesn't exist yet. Everything else is configuration or checking.</p>
+  <div class="stage"><span class="n">1</span><div><h3>Paid ads</h3><div class="where">Meta (2 audiences), YouTube</div></div><div class="what"><ul>
+    <li>Full UTM set on every ad (convention below). Leave Meta and Google auto-tagging on.</li>
+    <li>Week 1: optimize to landing-page views. Switch to purchase optimization at 15–20 sales, <b>but only if</b> Meta's health classification allows it. Fallback: optimize to InitiateCheckout if that's allowed, otherwise stay on landing-page views and lean on email follow-up.</li>
+  </ul></div></div>
+  <div class="stage"><span class="n">2</span><div><h3>List emails</h3><div class="where">AOL list, challenge list</div></div><div class="what"><ul>
+    <li><code>utm_source=aol-list</code> or <code>challenge-list</code>, <code>utm_medium=email</code>. Tagging them is what makes the brief's 85 paid / 15 organic split checkable.</li>
+  </ul></div></div>
+  <div class="stage"><span class="n">3</span><div><h3>Landing page</h3><div class="where">Unbounce</div></div><div class="what"><ul>
+    <li><code>aol.js</code> already sends <code>aol_cta</code> (with label and <code>aol_variant</code>) and <code>aol_faq_open</code> to the dataLayer. GTM forwards them to the chosen GA4 property. <span class="pill build">build</span></li>
+    <li><b>Primary page metric:</b> the click on the Register button. There is no form on the page in v2.</li>
+    <li>UTMs, click IDs, <code>aol_variant</code> and <code>timeZone</code> are added to every Register link by <code>aol.js</code>. <span class="pill done">Built Nov 13</span></li>
+    <li>Only one Meta pixel fires on this page.</li>
+  </ul></div></div>
+  <div class="stage"><span class="n">4</span><div><h3>Course select</h3><div class="where">members.us (Next.js)</div></div><div class="what"><ul>
+    <li>Already sends Segment "Product List Viewed" and <code>allcourses_enroll_click</code>.</li>
+    <li>The landing page passes <code>timeZone=EST</code>, <code>CST</code> or <code>PST</code>, so the list opens filtered to cohorts hosted in the visitor's zone. Mountain is left unfiltered because only 1 cohort was hosted there on Nov 13. Re-check the counts against the Jan–Mar schedule.</li>
+  </ul></div></div>
+  <div class="stage"><span class="n">5</span><div><h3>Checkout</h3><div class="where">Salesforce, Stripe, Flex</div></div><div class="what"><ul>
+    <li>Already fires <code>begin_checkout</code> and <code>add_to_cart</code>.</li>
+    <li>Store UTMs and <code>aol_variant</code> on the Salesforce order, so the CRM itself knows which ad sold the course. <span class="pill build">build</span> (members.us dev team)</li>
+    <li>Get the checkout email into HubSpot. HubSpot's collected-forms script is already on the page and may capture it automatically, or it may need a Salesforce→HubSpot sync. <span class="uv">verify</span></li>
+  </ul></div></div>
+  <div class="stage"><span class="n">6</span><div><h3>Registration</h3><div class="where">Confirmation</div></div><div class="what"><ul>
+    <li><code>sleep_course_purchase</code> in GA4 (mark it as the key event). A Meta <code>Purchase</code> through the existing GA4→Meta map and Conversions API, with a shared <code>event_id</code> for deduplication.</li>
+    <li>Add the Stripe and Flex domains to GA4's unwanted-referrals list, so returning from payment doesn't start a new session.</li>
+  </ul></div></div>
+  <div class="stage"><span class="n">7</span><div><h3>Checkout follow-up</h3><div class="where">HubSpot workflow</div></div><div class="what"><ul>
+    <li>Trigger: checkout email captured, and no purchase within 1 hour. Exit when a purchase arrives. <span class="pill build">build</span></li>
+    <li>Links tagged <code>utm_source=hubspot</code>, <code>utm_medium=email</code>, <code>utm_campaign=sap-ny27-recover</code>, <code>utm_content=ac1-seat / ac2-dates / ac3-offer</code>.</li>
+  </ul></div></div>
+
+  <h3 id="m-fixes">Pre-launch fixes</h3>
+  <p class="secnote">This replaces v1's "blocker: GTM access on members.us." That access already exists. The real work is consolidating and passing data through.</p>
+  <div class="risk"><span class="sev crit">Blocker</span><p><b>Check Meta's health classification.</b>Events Manager → data source settings. Then keep condition words ("anxiety," "insomnia") out of event names, URLs and custom parameters. If the pixel is restricted, the plan to optimize for purchases changes.</p></div>
+  <div class="risk"><span class="sev crit">Blocker</span><p><b>One Meta pixel, one GA4 property.</b>Choose which of the 5 pixels and 3 GA4 properties this campaign reports into. Remove the hard-coded pixel and the retired UA references from these pages.</p></div>
+  <div class="risk"><span class="sev crit">Blocker</span><p><b>UTMs through to the Salesforce order.</b>Without it, attribution lives only in GA4, which ad blockers and consent choices reduce. Fallback: GA4 plus a weekly match of checkout emails against HubSpot contacts.</p></div>
+  <div class="risk"><span class="sev warn">Verify</span><p><b><code>sleep_course_purchase</code> fires exactly once per real order,</b> with the right value, in the chosen property. Also check that the checkout email reaches HubSpot.</p></div>
+  <div class="risk"><span class="sev warn">Clean</span><p><b>On this page:</b> switch off Crazy Egg and Mouseflow (keep Clarity), IntelliTicks chat, Convertful, and any ad pixels the campaign doesn't use. Have the GTM owner review the 47 paused tags and two unknown ad domains.</p></div>
+  <div class="risk"><span class="sev warn">Fix</span><p><b>Checkout compliance:</b> untick the agreement and health boxes by default, and change "over 3 hours per day" to 2.5 hours on the course page.</p></div>
+
+  <h3 id="m-utm">UTM convention</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Parameter</th><th>Values</th><th>Encodes</th></tr>
+    <tr><td><code>utm_source</code></td><td><code>meta</code> · <code>youtube</code> · <code>aol-list</code> · <code>challenge-list</code> · <code>hubspot</code> · <code>aol-social</code></td><td>Where the click came from</td></tr>
+    <tr><td><code>utm_medium</code></td><td><code>paid-social</code> · <code>paid-video</code> · <code>email</code> · <code>organic-social</code></td><td>Channel type</td></tr>
+    <tr><td><code>utm_campaign</code></td><td><code>sap-ny27-s</code> · <code>sap-ny27-w</code> · <code>sap-ny27-rtg</code> · <code>sap-ny27-recover</code> · <code>sap-ny27-list</code></td><td>Flight + audience or journey</td></tr>
+    <tr><td><code>utm_content</code></td><td>The asset name, e.g. <code>vid15-307am-s</code>, <code>ac2-dates</code></td><td>The specific ad or email. This drives the weekly "top 2" budget move.</td></tr>
+    <tr><td><code>utm_term</code></td><td>Ad set / persona targeting, e.g. <code>denise-45-55</code></td><td>Which persona a targeting set was built for</td></tr>
+  </table></div>
+  <p>Example: <code>…/resolve-to-rest/?utm_source=meta&amp;utm_medium=paid-social&amp;utm_campaign=sap-ny27-w&amp;utm_content=vid15-offswitch-w&amp;utm_term=priya-28-40</code></p>
+
+  <h3 id="m-events">Event schema</h3>
+  <div class="tblwrap"><table>
+    <tr><th>Event</th><th>Fires</th><th>Goes to</th><th>Status</th></tr>
+    <tr><td><code>page_view</code></td><td>Both domains</td><td>GA4 + Meta PageView</td><td>Exists. Reduce to one pixel.</td></tr>
+    <tr><td><code>aol_cta</code></td><td>Register click on the landing page (primary page metric)</td><td>GA4</td><td>In <code>aol.js</code>. GTM tag needed.</td></tr>
+    <tr><td><code>aol_faq_open</code></td><td>FAQ toggle</td><td>GA4</td><td>In <code>aol.js</code>. GTM tag needed.</td></tr>
+    <tr><td>Product List Viewed / <code>allcourses_enroll_click</code></td><td>Course select</td><td>Segment, GA4</td><td>Exists</td></tr>
+    <tr><td><code>begin_checkout</code> / <code>add_to_cart</code></td><td>Checkout start</td><td>GA4, Meta InitiateCheckout</td><td>Exists</td></tr>
+    <tr><td>Checkout email captured</td><td>Email step</td><td>HubSpot contact</td><td><span class="uv">verify</span></td></tr>
+    <tr><td><code>sleep_course_purchase</code> / Purchase</td><td>Confirmation</td><td>GA4 + Meta pixel + Conversions API</td><td>Exists. Verify deduplication.</td></tr>
+    <tr><td>Email opens and clicks</td><td>Journeys A, B, C</td><td>HubSpot</td><td>Build the journeys</td></tr>
+  </table></div>
+
+  <h3 id="m-attr">Attribution policy</h3>
+  <p>At around 100 purchases, modeled attribution is mostly noise. Each tool answers one question:</p>
+  <ul class="check">
+    <li><b>Salesforce orders: the source of truth.</b> With UTMs stored on the order, this answers which ad, audience and variant produced each registration. The wrap report uses this.</li>
+    <li><b>HubSpot: email touches.</b> Did a follow-up email bring the buyer back?</li>
+    <li><b>GA4: the funnel.</b> Where people drop off, landing page conversion, and the split between audiences.</li>
+    <li><b>Meta and Google: budget signals only.</b> Never reconciled one-to-one against GA4.</li>
+  </ul>
+  <div class="tblwrap"><table>
+    <tr><th>Checkpoint</th><th class="num">Registrations</th><th>If behind</th></tr>
+    <tr><td>Jan 10, 2027</td><td class="num">10</td><td>Fix landing page or checkout friction; check the follow-up emails' recovery rate</td></tr>
+    <tr><td>Jan 24, 2027</td><td class="num">35</td><td>Move budget to the top 2 ads (by <code>utm_content</code>) and the stronger audience</td></tr>
+    <tr><td>Feb 7, 2027</td><td class="num">55</td><td>Add creator ads; widen retargeting</td></tr>
+    <tr><td>Feb 21, 2027</td><td class="num">75</td><td>Follow up blast2; review cohort times against demand</td></tr>
+    <tr><td>Mar 14, 2027</td><td class="num">100</td><td>Final push with real cohort dates</td></tr>
+  </table></div>
+
+  <h3 id="m-qa">QA gate, Dec 16</h3>
+  <ul class="check">
+    <li>Meta Events Manager: one pixel ID, one PageView per load, and a data-source category that allows purchase optimization.</li>
+    <li>From an ad URL with full UTMs: landing page → Register → course list opens filtered to the time zone → checkout URL still carries the UTMs and <code>aol_variant</code>.</li>
+    <li>GA4 DebugView, in the chosen property: <code>page_view</code>, <code>aol_cta</code>, <code>begin_checkout</code>, then <code>sleep_course_purchase</code>, all in one session across both domains.</li>
+    <li>One real test order: one <code>sleep_course_purchase</code>, one deduplicated Meta Purchase, and a Salesforce order with UTMs stored.</li>
+    <li>Abandoned test checkout: the contact appears in HubSpot and receives <code>ac1-seat</code> after one hour, and leaves the journey after buying.</li>
+    <li>Both hero arms report the correct <code>aol_variant</code> (<code>a</code> / <code>b</code>), and Unbounce splits close to 50/50.</li>
+    <li>The release grep in <code>landing/</code> passes: no placeholders, no <code>CONFIRM</code> markers.</li>
+  </ul>
+</section>
+
+<footer class="page">
+  <p>Sources: the NY2027 Lean B creative brief; the landing page audit of Aug 26, 2026; <code>landing/README.md</code> and <code>UNBOUNCE.md</code>; web research on Nov 13, 2026 (market data, competitors, messaging; items marked unverified rest on a single or secondary source); direct observation on Nov 13, 2026 of Meta's Ad Library, Google's Ads Transparency Center, the live Unbounce page, the members.us course and checkout pages (stopped before entering any details), and the public GTM-KFJ8G2M container. Personas are composites built from that research, not real customers.</p>
+</footer>
+
+</div>
+</main>
+
+<script>
+(function(){
+  var views=[].slice.call(document.querySelectorAll('[data-view]'));
+  var tabs=[].slice.call(document.querySelectorAll('.tabs a'));
+  function show(){
+    var h=decodeURIComponent((location.hash||'').slice(1));
+    var target=h?document.getElementById(h):null;
+    var view=target?(target.hasAttribute('data-view')?target:target.closest('[data-view]')):null;
+    if(!view){view=views[0];}
+    views.forEach(function(v){v.hidden=(v!==view);});
+    tabs.forEach(function(t){
+      if(t.getAttribute('href')==='#'+view.id){t.setAttribute('aria-current','page');}
+      else{t.removeAttribute('aria-current');}
+    });
+    if(target&&target!==view){target.scrollIntoView();}
+    else{window.scrollTo(0,0);}
+  }
+  window.addEventListener('hashchange',show);
+  show();
+})();
+</script>
+
+
+
+</body>
+</html>
